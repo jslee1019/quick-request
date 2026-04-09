@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>퀵 배송 요청</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  background: #f5f5f0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem 4rem;
+}
+.wrap {
+  width: 100%;
+  max-width: 540px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+}
+h1 { font-size: 18px; font-weight: 600; color: #111; margin-bottom: 1.75rem; }
+.progress { display: flex; gap: 6px; margin-bottom: 1.75rem; }
+.dot { height: 3px; flex: 1; border-radius: 2px; background: #e0e0e0; transition: background 0.2s; }
+.dot.done { background: #3B8BEB; }
+.step { display: none; }
+.step.active { display: block; }
+.step-label { font-size: 11px; color: #aaa; margin-bottom: 4px; letter-spacing: 0.05em; text-transform: uppercase; }
+.step-title { font-size: 18px; font-weight: 600; color: #111; margin-bottom: 1.25rem; }
+.field { margin-bottom: 1.1rem; }
+.field label { font-size: 13px; color: #666; display: block; margin-bottom: 5px; }
+.req { color: #E24B4A; margin-left: 2px; }
+.field input, .field select {
+  width: 100%; padding: 10px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fff;
+  color: #111;
+  font-family: inherit;
+  appearance: auto;
+}
+.field input.err-field { border-color: #E24B4A; }
+.field input:focus, .field select:focus { outline: none; border-color: #3B8BEB; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.sec-divider { font-size: 11px; font-weight: 600; color: #aaa; margin: 1.25rem 0 0.75rem; padding-top: 1.1rem; border-top: 1px solid #f0f0f0; letter-spacing: 0.05em; text-transform: uppercase; }
+.vehicle-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; margin-bottom: 1.1rem; }
+.vcard { padding: 10px 11px; border-radius: 8px; border: 1px solid #e0e0e0; cursor: pointer; background: #fff; transition: all 0.15s; }
+.vcard:hover { border-color: #aaa; }
+.vcard.sel { border: 2px solid #3B8BEB; background: #EBF3FD; }
+.vcard.err-field { border-color: #E24B4A; }
+.vcard .vname { font-size: 13px; font-weight: 600; color: #111; }
+.vcard .vdesc { font-size: 11px; color: #888; margin-top: 2px; }
+.vcard.sel .vname { color: #1a6bc4; }
+.vcard.sel .vdesc { color: #1a6bc4; opacity: 0.75; }
+.preset-grid { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.1rem; }
+.preset-btn {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 13px; border-radius: 8px; border: 1px solid #e0e0e0;
+  cursor: pointer; background: #fff; transition: all 0.15s; text-align: left; width: 100%;
+}
+.preset-btn:hover { border-color: #3B8BEB; background: #EBF3FD; }
+.preset-btn.sel { border: 2px solid #3B8BEB; background: #EBF3FD; }
+.preset-name { font-size: 14px; font-weight: 600; color: #111; }
+.preset-addr { font-size: 12px; color: #888; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 360px; }
+.preset-btn.sel .preset-name { color: #1a6bc4; }
+.preset-btn.sel .preset-addr { color: #1a6bc4; opacity: 0.75; }
+.preset-arrow { font-size: 13px; color: #ccc; margin-left: 8px; flex-shrink: 0; }
+.pill-group { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; }
+.pill {
+  padding: 7px 13px; border-radius: 999px; border: 1px solid #e0e0e0;
+  font-size: 13px; cursor: pointer; background: #fff; color: #666;
+  transition: all 0.15s; white-space: nowrap; font-family: inherit;
+}
+.pill:hover { border-color: #aaa; color: #111; }
+.pill.sel { background: #EBF3FD; color: #1a6bc4; border-color: #3B8BEB; font-weight: 600; }
+.pill.err-field { border-color: #E24B4A; }
+.datetime-wrap { margin-bottom: 1.1rem; }
+.datetime-wrap > label { font-size: 13px; color: #666; display: block; margin-bottom: 5px; }
+.dt-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.notice-cards { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.1rem; }
+.notice-card { padding: 10px 13px; border-radius: 8px; border: 1px solid #e0e0e0; cursor: pointer; background: #fff; transition: all 0.15s; }
+.notice-card:hover { border-color: #aaa; }
+.notice-card.sel { border: 2px solid #3B8BEB; background: #EBF3FD; }
+.notice-card .ntitle { font-size: 13px; font-weight: 600; color: #111; margin-bottom: 3px; }
+.notice-card .nbody { font-size: 12px; color: #888; line-height: 1.55; }
+.notice-card.sel .ntitle { color: #1a6bc4; }
+.notice-card.sel .nbody { color: #1a6bc4; opacity: 0.8; }
+.auto-notice { padding: 10px 13px; border-radius: 8px; border: 1.5px dashed #3B8BEB; background: #EBF3FD; margin-bottom: 1.1rem; }
+.auto-notice .alabel { font-size: 11px; font-weight: 600; color: #1a6bc4; margin-bottom: 4px; }
+.auto-notice .abody { font-size: 12px; color: #1a6bc4; line-height: 1.55; opacity: 0.85; }
+.section-bar { height: 1px; background: #f0f0f0; margin: 1.5rem 0; }
+.tag-opt { font-size: 11px; padding: 2px 7px; border-radius: 999px; background: #f5f5f5; color: #aaa; border: 1px solid #e8e8e8; display: inline-block; margin-left: 5px; vertical-align: middle; }
+.err-msg { font-size: 12px; color: #E24B4A; margin-top: 5px; display: none; }
+.btn-row { display: flex; gap: 8px; }
+.btn { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #e0e0e0; font-size: 15px; cursor: pointer; background: #fff; color: #333; font-family: inherit; transition: all 0.15s; }
+.btn:hover { background: #f5f5f5; }
+.btn.primary { background: #3B8BEB; color: #fff; border-color: #3B8BEB; font-weight: 600; }
+.btn.primary:hover { background: #2a7ad4; }
+.result-box { background: #f9f9f7; border-radius: 10px; border: 1px solid #e8e8e8; padding: 1rem 1.25rem; margin-bottom: 1rem; }
+.result-box pre { font-family: inherit; font-size: 13px; white-space: pre-wrap; line-height: 1.85; color: #222; }
+.copy-btn { width: 100%; padding: 13px; border-radius: 8px; border: none; background: #3B8BEB; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+.copy-btn:hover { background: #2a7ad4; }
+.copy-btn.done { background: #27ae60; }
+.result-nav { display: flex; gap: 8px; margin-top: 10px; }
+.nav-btn { flex: 1; padding: 10px 6px; border-radius: 8px; border: 1px solid #e0e0e0; font-size: 12px; cursor: pointer; background: #fff; color: #666; font-family: inherit; text-align: center; line-height: 1.4; transition: all 0.15s; }
+.nav-btn:hover { background: #f5f5f5; color: #111; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🚚 퀵 배송 요청</h1>
+  <div class="progress">
+    <div class="dot done" id="d0"></div>
+    <div class="dot" id="d1"></div>
+    <div class="dot" id="d2"></div>
+  </div>
+
+  <!-- Step 0: 물품 + 차량 -->
+  <div class="step active" id="s0">
+    <div class="step-label">1단계</div>
+    <div class="step-title">물품 정보 & 차량 선택</div>
+    <div class="field">
+      <label>물품 내용<span class="req">*</span></label>
+      <input type="text" id="item" placeholder="예) 말통 3통, 소박스 2박스">
+    </div>
+    <div class="sec-divider">차량 종류</div>
+    <div class="vehicle-grid" id="vehicle-grid">
+      <div class="vcard" data-val="다마스"><div class="vname">다마스</div><div class="vdesc">소형 / 도심</div></div>
+      <div class="vcard" data-val="라보"><div class="vname">라보</div><div class="vdesc">소형 / 개방형</div></div>
+      <div class="vcard" data-val="1톤 탑차/윙바디"><div class="vname">1톤 탑차/윙바디</div><div class="vdesc">밀폐형</div></div>
+      <div class="vcard" data-val="1톤 오픈형"><div class="vname">1톤 오픈형</div><div class="vdesc">개방형 화물</div></div>
+      <div class="vcard" data-val="1톤 냉장/냉동"><div class="vname">1톤 냉장/냉동</div><div class="vdesc">저온 식품</div></div>
+      <div class="vcard" data-val="2.5톤"><div class="vname">2.5톤</div><div class="vdesc">중형 화물</div></div>
+      <div class="vcard" data-val="5톤"><div class="vname">5톤</div><div class="vdesc">대형 화물</div></div>
+      <div class="vcard" data-val="직접 입력"><div class="vname">기타</div><div class="vdesc">직접 입력</div></div>
+    </div>
+    <div class="field" id="vehicle-other-wrap" style="display:none;">
+      <label>차량 직접 입력</label>
+      <input type="text" id="vehicle-other" placeholder="차량 종류를 입력하세요">
+    </div>
+    <div class="field" id="temp-wrap" style="display:none;">
+      <label>냉장/냉동 온도<span class="tag-opt">선택</span></label>
+      <input type="text" id="temp" placeholder="예) -18℃ 이하, 0~5℃">
+    </div>
+    <div class="err-msg" id="err0-item">물품 내용을 입력해주세요.</div>
+    <div class="err-msg" id="err0-vehicle">차량을 선택해주세요.</div>
+    <div class="btn-row" style="margin-top:1.5rem;">
+      <button class="btn primary" onclick="next(0)">다음</button>
+    </div>
+  </div>
+
+  <!-- Step 1: 출발지 -->
+  <div class="step" id="s1">
+    <div class="step-label">2단계</div>
+    <div class="step-title">출발지 (픽업)</div>
+    <div class="preset-grid" id="from-presets"></div>
+    <div class="field">
+      <label>픽업 주소<span class="req">*</span></label>
+      <input type="text" id="from-addr" placeholder="주소를 직접 입력하거나 위에서 선택하세요">
+    </div>
+    <div class="field">
+      <label>담당자 / 연락처<span class="req">*</span></label>
+      <input type="text" id="from-contact" placeholder="예) 홍길동 010-0000-0000">
+    </div>
+    <div class="datetime-wrap">
+      <label>픽업 일시<span class="req" style="color:#E24B4A;">*</span></label>
+      <div class="pill-group" id="from-quick">
+        <div class="pill" data-mode="immediate">즉시 요청</div>
+        <div class="pill" data-mode="pick">날짜/시간 선택</div>
+      </div>
+      <div id="from-dt-fields" style="display:none;">
+        <div class="dt-row">
+          <div class="field" style="margin-bottom:0;"><input type="date" id="from-date"></div>
+          <div class="field" style="margin-bottom:0;"><select id="from-time"></select></div>
+        </div>
+      </div>
+    </div>
+    <div class="sec-divider">출발지 특이사항</div>
+    <div id="from-auto-notice" style="display:none;">
+      <div class="auto-notice">
+        <div class="alabel">자동 감지 — 산스 (수표로28길 30)</div>
+        <div class="abody">오시는 길: 낙원상가에서 나오시다가 좌측에 익선동 노가리마켓 보이면 차 세우고, 부산오뎅과 노가리마켓 사이 골목으로 들어와주세요! 갈림길에서 우측으로 쭉 직진하셔서 벽면에 스테인리스 붙어있는 건물입니다.</div>
+      </div>
+    </div>
+    <div class="notice-cards" id="from-notice-cards"></div>
+    <div class="field">
+      <label>픽업 메모<span class="tag-opt">선택</span></label>
+      <input type="text" id="from-memo" placeholder="예) 1층 물류창고 앞, 사전 연락 필요">
+    </div>
+    <div class="err-msg" id="err1-addr">픽업 주소를 입력해주세요.</div>
+    <div class="err-msg" id="err1-contact">담당자/연락처를 입력해주세요.</div>
+    <div class="err-msg" id="err1-dt">픽업 일시를 선택해주세요.</div>
+    <div class="btn-row" style="margin-top:1.5rem;">
+      <button class="btn" onclick="goTo(0)">이전</button>
+      <button class="btn primary" onclick="next(1)">다음</button>
+    </div>
+  </div>
+
+  <!-- Step 2: 도착지 -->
+  <div class="step" id="s2">
+    <div class="step-label">3단계</div>
+    <div class="step-title">도착지 (배송)</div>
+    <div class="preset-grid" id="to-presets"></div>
+    <div class="field">
+      <label>배송 주소<span class="req">*</span></label>
+      <input type="text" id="to-addr" placeholder="주소를 직접 입력하거나 위에서 선택하세요">
+    </div>
+    <div class="field">
+      <label>수령인 / 연락처<span class="req">*</span></label>
+      <input type="text" id="to-contact" placeholder="예) 이대리 010-1234-5678">
+    </div>
+    <div class="datetime-wrap">
+      <label>도착 희망 일시<span class="req" style="color:#E24B4A;">*</span></label>
+      <div class="pill-group" id="to-quick">
+        <div class="pill" data-mode="asap">최대한 빠르게</div>
+        <div class="pill" data-mode="pick">날짜/시간 선택</div>
+      </div>
+      <div id="to-dt-fields" style="display:none;">
+        <div class="dt-row">
+          <div class="field" style="margin-bottom:0;"><input type="date" id="to-date"></div>
+          <div class="field" style="margin-bottom:0;"><select id="to-time"></select></div>
+        </div>
+      </div>
+    </div>
+    <div class="sec-divider">도착지 특이사항</div>
+    <div id="to-auto-notice" style="display:none;">
+      <div class="auto-notice">
+        <div class="alabel">자동 감지 — 산스 (수표로28길 30)</div>
+        <div class="abody">오시는 길: 낙원상가에서 나오시다가 좌측에 익선동 노가리마켓 보이면 차 세우고, 부산오뎅과 노가리마켓 사이 골목으로 들어와주세요! 갈림길에서 우측으로 쭉 직진하셔서 벽면에 스테인리스 붙어있는 건물입니다.</div>
+      </div>
+    </div>
+    <div class="notice-cards" id="to-notice-cards"></div>
+    <div class="field">
+      <label>추가 메모<span class="tag-opt">선택</span></label>
+      <input type="text" id="to-memo" placeholder="예) 파손 주의, 냉동 유지 필수">
+    </div>
+    <div class="sec-divider">결제 방식</div>
+    <div class="pill-group" id="pay-group">
+      <div class="pill sel" data-val="월정산">월정산</div>
+      <div class="pill" data-val="착불">착불</div>
+    </div>
+    <div class="section-bar"></div>
+    <div class="err-msg" id="err2-addr">배송 주소를 입력해주세요.</div>
+    <div class="err-msg" id="err2-contact">수령인/연락처를 입력해주세요.</div>
+    <div class="err-msg" id="err2-dt">도착 희망 일시를 선택해주세요.</div>
+    <div class="btn-row">
+      <button class="btn" onclick="goTo(1)">이전</button>
+      <button class="btn primary" onclick="generate()">메시지 만들기</button>
+    </div>
+  </div>
+
+  <!-- Step 3: 결과 -->
+  <div class="step" id="s3">
+    <div class="step-label">완성</div>
+    <div class="step-title">카톡에 붙여넣기 하세요</div>
+    <div class="result-box"><pre id="result-text"></pre></div>
+    <button class="copy-btn" id="copy-btn" onclick="copyMsg()">복사하기</button>
+    <div class="result-nav">
+      <div class="nav-btn" onclick="goTo(0)">물품 정보 &<br>차량 수정</div>
+      <div class="nav-btn" onclick="goTo(1)">출발지<br>정보 수정</div>
+      <div class="nav-btn" onclick="goTo(2)">도착지<br>정보 수정</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SANS_KEYWORD = '수표로28길';
+const SANS_NOTICE = '오시는 길: 낙원상가에서 나오시다가 좌측에 익선동 노가리마켓 보이면 차 세우고, 부산오뎅과 노가리마켓 사이 골목으로 들어와주세요! 갈림길에서 우측으로 쭉 직진하셔서 벽면에 스테인리스 붙어있는 건물입니다.';
+const PRESETS = [
+  { name: '모두먼트', addr: '경기 이천시 마장면 프리미엄아울렛로 33-48 A동 2층 모두먼트', contact: '배준혁 010-5582-2921' },
+  { name: '삼우에프앤지', addr: '경기 김포시 고촌읍 아라육로57번길 15 삼우 에프앤지', contact: '출고 현장 관리자 031-996-5404' },
+  { name: '일산창고', addr: '경기 고양시 덕양구 통일로 1031번길 458 대양물류보관창고(컨테이너창고)', contact: '창고 담당자 010-5472-6111' },
+  { name: '신세계 강남', addr: '서울 서초구 신반포로 176 신세계백화점 강남점 스위트파크 지하1층 산스sans', contact: '' },
+  { name: '산스 익선', addr: '서울 종로구 수표로28길 30 산스 sans', contact: '' },
+];
+const FROM_NOTICES = [
+  { id: 'fn_carry', title: '출발지 주소까지 오셔서 직접 운반 필요', body: '출발지 주소까지 오셔서 직접 픽업하여 가져가셔야 합니다.' },
+  { id: 'fn_time', title: '픽업 시간 엄수', body: '안내드린 픽업 시간에 맞춰 도착해주세요. 일찍 도착하셔도 담당자가 없을 수 있으니 지정 시간까지 대기 부탁드립니다.' },
+  { id: 'fn_contact', title: '도착 전 연락 필수', body: '픽업 장소 도착 전 담당자에게 미리 연락해주세요.' },
+];
+const TO_NOTICES = [
+  { id: 'tn_carry', title: '도착지까지 직접 운반 필요', body: '도착지까지 직접 옮겨주셔야 합니다.' },
+  { id: 'tn_time', title: '도착 시간 엄수 — 조기 하차 불가', body: '안내드린 시간에 맞춰 도착해주세요. 일찍 도착하셔도 수령 담당자가 없을 수 있으니, 지정 시간 전 임의로 하차하지 말아 주시기 바랍니다.' },
+];
+
+const state = { pay: '월정산' };
+const selectedFromNotices = new Set();
+const selectedToNotices = new Set();
+
+function checkSansAddr(addr, autoId) {
+  document.getElementById(autoId).style.display = addr.includes(SANS_KEYWORD) ? 'block' : 'none';
+}
+
+function buildTimeSelect(id) {
+  const sel = document.getElementById(id);
+  sel.innerHTML = '<option value="">시간 선택</option>';
+  for (let h = 0; h < 24; h++) {
+    for (let m of [0, 15, 30, 45]) {
+      const hh = String(h).padStart(2,'0'), mm = String(m).padStart(2,'0');
+      const ampm = h < 12 ? '오전' : '오후';
+      const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+      sel.innerHTML += `<option value="${hh}:${mm}">${ampm} ${h12}시${m > 0 ? ' ' + mm + '분' : ''}</option>`;
+    }
+  }
+}
+
+function setupQuickTime(groupId, fieldsId, stateKey) {
+  document.getElementById(groupId).querySelectorAll('.pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById(groupId).querySelectorAll('.pill').forEach(b => b.classList.remove('sel','err-field'));
+      btn.classList.add('sel');
+      document.getElementById(fieldsId).style.display = btn.dataset.mode === 'pick' ? 'block' : 'none';
+      state[stateKey] = btn.dataset.mode === 'pick' ? null : btn.dataset.mode;
+    });
+  });
+}
+
+document.getElementById('pay-group').querySelectorAll('.pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.getElementById('pay-group').querySelectorAll('.pill').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    state.pay = btn.dataset.val;
+  });
+});
+
+buildTimeSelect('from-time');
+buildTimeSelect('to-time');
+setupQuickTime('from-quick', 'from-dt-fields', 'fromMode');
+setupQuickTime('to-quick', 'to-dt-fields', 'toMode');
+
+document.getElementById('from-addr').addEventListener('input', e => checkSansAddr(e.target.value, 'from-auto-notice'));
+document.getElementById('to-addr').addEventListener('input', e => checkSansAddr(e.target.value, 'to-auto-notice'));
+
+function buildPresets(containerId, type) {
+  const el = document.getElementById(containerId);
+  PRESETS.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn';
+    btn.innerHTML = `<div style="overflow:hidden;flex:1;min-width:0;"><div class="preset-name">${p.name}</div><div class="preset-addr">${p.addr}</div></div><span class="preset-arrow">→</span>`;
+    btn.addEventListener('click', () => {
+      el.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('sel'));
+      btn.classList.add('sel');
+      const addrId = type === 'from' ? 'from-addr' : 'to-addr';
+      const contactId = type === 'from' ? 'from-contact' : 'to-contact';
+      const autoId = type === 'from' ? 'from-auto-notice' : 'to-auto-notice';
+      document.getElementById(addrId).value = p.addr;
+      document.getElementById(contactId).value = p.contact;
+      checkSansAddr(p.addr, autoId);
+    });
+    el.appendChild(btn);
+  });
+}
+
+function buildNotices(containerId, notices, selectedSet) {
+  const el = document.getElementById(containerId);
+  notices.forEach(n => {
+    const card = document.createElement('div');
+    card.className = 'notice-card';
+    card.innerHTML = `<div class="ntitle">${n.title}</div><div class="nbody">${n.body}</div>`;
+    card.addEventListener('click', () => {
+      if (selectedSet.has(n.id)) { selectedSet.delete(n.id); card.classList.remove('sel'); }
+      else { selectedSet.add(n.id); card.classList.add('sel'); }
+    });
+    el.appendChild(card);
+  });
+}
+
+buildPresets('from-presets', 'from');
+buildPresets('to-presets', 'to');
+buildNotices('from-notice-cards', FROM_NOTICES, selectedFromNotices);
+buildNotices('to-notice-cards', TO_NOTICES, selectedToNotices);
+
+document.getElementById('vehicle-grid').querySelectorAll('.vcard').forEach(c => {
+  c.addEventListener('click', () => {
+    document.getElementById('vehicle-grid').querySelectorAll('.vcard').forEach(x => x.classList.remove('sel','err-field'));
+    c.classList.add('sel');
+    state.vehicle = c.dataset.val;
+    document.getElementById('vehicle-other-wrap').style.display = c.dataset.val === '직접 입력' ? 'block' : 'none';
+    document.getElementById('temp-wrap').style.display = c.dataset.val.includes('냉장') ? 'block' : 'none';
+    document.getElementById('err0-vehicle').style.display = 'none';
+  });
+});
+
+function se(id, show) { document.getElementById(id).style.display = show ? 'block' : 'none'; }
+
+function goTo(n) {
+  document.querySelectorAll('.step').forEach((s, i) => s.classList.toggle('active', i === n));
+  for (let i = 0; i <= 2; i++) document.getElementById('d' + i).classList.toggle('done', i <= n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function next(n) {
+  if (n === 0) {
+    state.item = document.getElementById('item').value.trim();
+    if (state.vehicle === '직접 입력') state.vehicle = document.getElementById('vehicle-other').value.trim();
+    state.temp = document.getElementById('temp').value.trim();
+    const noItem = !state.item, noVehicle = !state.vehicle;
+    document.getElementById('item').classList.toggle('err-field', noItem);
+    if (noVehicle) document.getElementById('vehicle-grid').querySelectorAll('.vcard:not(.sel)').forEach(v => v.classList.add('err-field'));
+    se('err0-item', noItem); se('err0-vehicle', noVehicle);
+    if (noItem || noVehicle) return;
+  }
+  if (n === 1) {
+    state.fromAddr = document.getElementById('from-addr').value.trim();
+    state.fromContact = document.getElementById('from-contact').value.trim();
+    state.fromMemo = document.getElementById('from-memo').value.trim();
+    const dtOk = state.fromMode === 'immediate' || (document.getElementById('from-date').value && document.getElementById('from-time').value);
+    const noAddr = !state.fromAddr, noContact = !state.fromContact, noDt = !state.fromMode && !dtOk;
+    document.getElementById('from-addr').classList.toggle('err-field', noAddr);
+    document.getElementById('from-contact').classList.toggle('err-field', noContact);
+    if (noDt) document.getElementById('from-quick').querySelectorAll('.pill').forEach(q => q.classList.add('err-field'));
+    else document.getElementById('from-quick').querySelectorAll('.pill').forEach(q => q.classList.remove('err-field'));
+    se('err1-addr', noAddr); se('err1-contact', noContact); se('err1-dt', noDt);
+    if (noAddr || noContact || noDt) return;
+  }
+  goTo(n + 1);
+}
+
+function fmtDate(d) {
+  if (!d) return '';
+  const [y, m, day] = d.split('-');
+  return y + '년 ' + parseInt(m) + '월 ' + parseInt(day) + '일';
+}
+function fmtTime(t) {
+  if (!t) return '';
+  const [h, m] = t.split(':');
+  const hh = parseInt(h);
+  return (hh < 12 ? '오전 ' : '오후 ') + (hh === 0 ? 12 : hh > 12 ? hh - 12 : hh) + (m !== '00' ? ':' + m : '시');
+}
+
+function generate() {
+  state.toAddr = document.getElementById('to-addr').value.trim();
+  state.toContact = document.getElementById('to-contact').value.trim();
+  state.toMemo = document.getElementById('to-memo').value.trim();
+  const dtOk = state.toMode === 'asap' || (document.getElementById('to-date').value && document.getElementById('to-time').value);
+  const noAddr = !state.toAddr, noContact = !state.toContact, noDt = !state.toMode && !dtOk;
+  document.getElementById('to-addr').classList.toggle('err-field', noAddr);
+  document.getElementById('to-contact').classList.toggle('err-field', noContact);
+  if (noDt) document.getElementById('to-quick').querySelectorAll('.pill').forEach(q => q.classList.add('err-field'));
+  else document.getElementById('to-quick').querySelectorAll('.pill').forEach(q => q.classList.remove('err-field'));
+  se('err2-addr', noAddr); se('err2-contact', noContact); se('err2-dt', noDt);
+  if (noAddr || noContact || noDt) return;
+
+  const fromDT = state.fromMode === 'immediate' ? '즉시 요청'
+    : [fmtDate(document.getElementById('from-date').value), fmtTime(document.getElementById('from-time').value)].filter(Boolean).join(' ');
+  const toDT = state.toMode === 'asap' ? '최대한 빠르게'
+    : [fmtDate(document.getElementById('to-date').value), fmtTime(document.getElementById('to-time').value)].filter(Boolean).join(' ');
+
+  const fromSans = state.fromAddr && state.fromAddr.includes(SANS_KEYWORD);
+  const toSans = state.toAddr && state.toAddr.includes(SANS_KEYWORD);
+  const fromNoticeLines = [
+    ...FROM_NOTICES.filter(n => selectedFromNotices.has(n.id)).map(n => '  ⚠ ' + n.body),
+    ...(fromSans ? ['  ' + SANS_NOTICE] : [])
+  ].join('\n');
+  const toNoticeLines = [
+    ...TO_NOTICES.filter(n => selectedToNotices.has(n.id)).map(n => '  ⚠ ' + n.body),
+    ...(toSans ? ['  ' + SANS_NOTICE] : [])
+  ].join('\n');
+
+  let msg = '🚚 퀵 배송 요청\n';
+  msg += '─────────────────\n';
+  msg += '📦 물품: ' + state.item + '\n';
+  msg += '  차량: ' + state.vehicle + '\n';
+  if (state.temp) msg += '  온도: ' + state.temp + '\n';
+  msg += '─────────────────\n';
+  msg += '📍 출발지 (픽업)\n';
+  msg += '  주소: ' + state.fromAddr + '\n';
+  msg += '  담당자: ' + state.fromContact + '\n';
+  msg += '  일시: ' + fromDT + '\n';
+  if (fromNoticeLines) msg += '  특이사항:\n' + fromNoticeLines + '\n';
+  if (state.fromMemo) msg += '  메모: ' + state.fromMemo + '\n';
+  msg += '─────────────────\n';
+  msg += '📍 도착지 (배송)\n';
+  msg += '  주소: ' + state.toAddr + '\n';
+  msg += '  수령인: ' + state.toContact + '\n';
+  msg += '  희망일시: ' + toDT + '\n';
+  if (toNoticeLines) msg += '  특이사항:\n' + toNoticeLines + '\n';
+  if (state.toMemo) msg += '  메모: ' + state.toMemo + '\n';
+  msg += '─────────────────\n';
+  msg += '💳 결제: ' + state.pay + '\n';
+
+  document.getElementById('result-text').textContent = msg.trim();
+  goTo(3);
+}
+
+function copyMsg() {
+  const btn = document.getElementById('copy-btn');
+  navigator.clipboard.writeText(document.getElementById('result-text').textContent).then(() => {
+    btn.textContent = '✓ 복사 완료!';
+    btn.classList.add('done');
+    setTimeout(() => { btn.textContent = '복사하기'; btn.classList.remove('done'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
