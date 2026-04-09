@@ -480,14 +480,14 @@ function generate() {
   msg += '📍 출발지 (픽업)\n';
   msg += '  주소: ' + state.fromAddr + '\n';
   msg += '  담당자: ' + state.fromContact + '\n';
-  msg += '  일시: ' + fromDT + '\n';
+  msg += '  출발일시: ' + fromDT + '\n';
   if (fromNoticeLines) msg += '  특이사항:\n' + fromNoticeLines + '\n';
   if (state.fromMemo) msg += '  메모: ' + state.fromMemo + '\n';
   msg += '─────────────────\n';
   msg += '📍 도착지 (배송)\n';
   msg += '  주소: ' + state.toAddr + '\n';
   msg += '  수령인: ' + state.toContact + '\n';
-  msg += '  희망일시: ' + toDT + '\n';
+  msg += '  도착일시: ' + toDT + '\n';
   if (toNoticeLines) msg += '  특이사항:\n' + toNoticeLines + '\n';
   if (state.toMemo) msg += '  메모: ' + state.toMemo + '\n';
   msg += '─────────────────\n';
