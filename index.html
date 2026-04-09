@@ -157,6 +157,7 @@ h1 { font-size: 18px; font-weight: 600; color: #111; margin-bottom: 1.75rem; }
   <div class="step" id="s1">
     <div class="step-label">2단계</div>
     <div class="step-title">출발지 (픽업)</div>
+    <div class="sec-divider" style="margin-top:0; border-top:none; padding-top:0;">자주 쓰는 주소</div>
     <div class="preset-grid" id="from-presets"></div>
     <div class="field">
       <label>픽업 주소<span class="req">*</span></label>
@@ -204,6 +205,7 @@ h1 { font-size: 18px; font-weight: 600; color: #111; margin-bottom: 1.75rem; }
   <div class="step" id="s2">
     <div class="step-label">3단계</div>
     <div class="step-title">도착지 (배송)</div>
+    <div class="sec-divider" style="margin-top:0; border-top:none; padding-top:0;">자주 쓰는 주소</div>
     <div class="preset-grid" id="to-presets"></div>
     <div class="field">
       <label>배송 주소<span class="req">*</span></label>
@@ -342,14 +344,21 @@ function buildPresets(containerId, type) {
     btn.className = 'preset-btn';
     btn.innerHTML = `<div style="overflow:hidden;flex:1;min-width:0;"><div class="preset-name">${p.name}</div><div class="preset-addr">${p.addr}</div></div><span class="preset-arrow">→</span>`;
     btn.addEventListener('click', () => {
-      el.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('sel'));
-      btn.classList.add('sel');
       const addrId = type === 'from' ? 'from-addr' : 'to-addr';
       const contactId = type === 'from' ? 'from-contact' : 'to-contact';
       const autoId = type === 'from' ? 'from-auto-notice' : 'to-auto-notice';
-      document.getElementById(addrId).value = p.addr;
-      document.getElementById(contactId).value = p.contact;
-      checkSansAddr(p.addr, autoId);
+      if (btn.classList.contains('sel')) {
+        btn.classList.remove('sel');
+        document.getElementById(addrId).value = '';
+        document.getElementById(contactId).value = '';
+        checkSansAddr('', autoId);
+      } else {
+        el.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('sel'));
+        btn.classList.add('sel');
+        document.getElementById(addrId).value = p.addr;
+        document.getElementById(contactId).value = p.contact;
+        checkSansAddr(p.addr, autoId);
+      }
     });
     el.appendChild(btn);
   });
