@@ -435,7 +435,9 @@ function next(n) {
 function fmtDate(d) {
   if (!d) return '';
   const [y, m, day] = d.split('-');
-  return y + '년 ' + parseInt(m) + '월 ' + parseInt(day) + '일';
+  const days = ['일', '월', '화', '수', '목', '금', '토'];
+  const dow = days[new Date(parseInt(y), parseInt(m) - 1, parseInt(day)).getDay()];
+  return y + '년 ' + parseInt(m) + '월 ' + parseInt(day) + '일(' + dow + ')';
 }
 function fmtTime(t) {
   if (!t) return '';
