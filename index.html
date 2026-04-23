@@ -108,11 +108,16 @@ h1 { font-size: 18px; font-weight: 600; color: #111; margin-bottom: 1.75rem; }
 .result-nav { display: flex; gap: 8px; margin-top: 10px; }
 .nav-btn { flex: 1; padding: 10px 6px; border-radius: 8px; border: 1px solid #e0e0e0; font-size: 12px; cursor: pointer; background: #fff; color: #666; font-family: inherit; text-align: center; line-height: 1.4; transition: all 0.15s; }
 .nav-btn:hover { background: #f5f5f5; color: #111; }
+.contact-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.contact-btn { padding: 5px 11px; border-radius: 999px; border: 1px solid #e0e0e0; font-size: 12px; cursor: pointer; background: #fff; color: #555; font-family: inherit; transition: all 0.15s; white-space: nowrap; }
+.contact-btn:hover { border-color: #aaa; color: #111; }
+.contact-btn:disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>🚚 퀵 배송 요청</h1>
+  <div style="font-size:11px; color:#ccc; margin-top:-1.25rem; margin-bottom:1.25rem;">v2025.04.23</div>
   <div class="progress">
     <div class="dot done" id="d0"></div>
     <div class="dot" id="d1"></div>
@@ -166,6 +171,7 @@ h1 { font-size: 18px; font-weight: 600; color: #111; margin-bottom: 1.75rem; }
     <div class="field">
       <label>담당자 / 연락처<span class="req">*</span></label>
       <input type="text" id="from-contact" placeholder="예) 홍길동 010-0000-0000">
+      <div class="contact-btns" id="from-contact-btns" style="margin-top:8px; margin-bottom:0;"></div>
     </div>
     <div class="datetime-wrap">
       <label>픽업 일시<span class="req" style="color:#E24B4A;">*</span></label>
@@ -185,6 +191,12 @@ h1 { font-size: 18px; font-weight: 600; color: #111; margin-bottom: 1.75rem; }
       <div class="auto-notice">
         <div class="alabel">자동 감지 — 산스 (수표로28길 30)</div>
         <div class="abody">오시는 길: 낙원상가에서 나오시다가 좌측에 익선동 노가리마켓 보이면 차 세우고, 부산오뎅과 노가리마켓 사이 골목으로 들어와주세요! 갈림길에서 우측으로 쭉 직진하셔서 벽면에 스테인리스 붙어있는 건물입니다.</div>
+      </div>
+    </div>
+    <div id="from-shinsegae-notice" style="display:none;">
+      <div class="auto-notice">
+        <div class="alabel">자동 감지 — 신세계 강남</div>
+        <div class="abody">매장 안쪽까지 이동 거리가 있습니다. 끌 차(핸드트럭) 필수 지참 부탁드리며, 물건을 끝까지 성실하게 운반해주실 기사님을 요청드립니다. </div>
       </div>
     </div>
     <div class="notice-cards" id="from-notice-cards"></div>
@@ -214,6 +226,7 @@ h1 { font-size: 18px; font-weight: 600; color: #111; margin-bottom: 1.75rem; }
     <div class="field">
       <label>수령인 / 연락처<span class="req">*</span></label>
       <input type="text" id="to-contact" placeholder="예) 이대리 010-1234-5678">
+      <div class="contact-btns" id="to-contact-btns" style="margin-top:8px; margin-bottom:0;"></div>
     </div>
     <div class="datetime-wrap">
       <label>도착 희망 일시<span class="req" style="color:#E24B4A;">*</span></label>
@@ -233,6 +246,12 @@ h1 { font-size: 18px; font-weight: 600; color: #111; margin-bottom: 1.75rem; }
       <div class="auto-notice">
         <div class="alabel">자동 감지 — 산스 (수표로28길 30)</div>
         <div class="abody">오시는 길: 낙원상가에서 나오시다가 좌측에 익선동 노가리마켓 보이면 차 세우고, 부산오뎅과 노가리마켓 사이 골목으로 들어와주세요! 갈림길에서 우측으로 쭉 직진하셔서 벽면에 스테인리스 붙어있는 건물입니다.</div>
+      </div>
+    </div>
+    <div id="to-shinsegae-notice" style="display:none;">
+      <div class="auto-notice">
+        <div class="alabel">자동 감지 — 신세계 강남</div>
+        <div class="abody">매장 안쪽까지 이동 거리가 있습니다. 끌 차(핸드트럭) 필수 지참 부탁드리며, 물건을 끝까지 성실하게 운반해주실 기사님을 요청드립니다. </div>
       </div>
     </div>
     <div class="notice-cards" id="to-notice-cards"></div>
@@ -272,14 +291,15 @@ h1 { font-size: 18px; font-weight: 600; color: #111; margin-bottom: 1.75rem; }
 <script>
 const SANS_KEYWORD = '수표로28길';
 const SANS_NOTICE = '오시는 길: 낙원상가에서 나오시다가 좌측에 익선동 노가리마켓 보이면 차 세우고, 부산오뎅과 노가리마켓 사이 골목으로 들어와주세요! 갈림길에서 우측으로 쭉 직진하셔서 벽면에 스테인리스 붙어있는 건물입니다.';
+const SHINSEGAE_KEYWORD = '신반포로 176';
+const SHINSEGAE_NOTICE = '매장 안쪽까지 이동 거리가 있습니다. 끌 차(핸드트럭) 필수 지참 부탁드리며, 물건을 끝까지 성실하게 운반해주실 기사님을 요청드립니다.';;
 const PRESETS = [
-  { name: '모두먼트', addr: '경기 이천시 마장면 프리미엄아울렛로 33-48 A동 2층 모두먼트', contact: '배준혁 010-5582-2921' },
-  { name: '삼우에프앤지', addr: '경기 김포시 고촌읍 아라육로57번길 15 삼우 에프앤지', contact: '출고 현장 관리자 031-996-5404' },
-  { name: '일산창고', addr: '경기 고양시 덕양구 통일로 1031번길 458 대양물류보관창고(컨테이너창고)', contact: '창고 담당자 010-5472-6111' },
-  { name: '신세계 강남', addr: '서울 서초구 신반포로 176 신세계백화점 강남점 스위트파크 지하1층 산스sans', contact: '' },
-  { name: '산스 익선', addr: '서울 종로구 수표로28길 30 산스 sans', contact: '' },
-  { name: '현대백화점 무역센터', addr: '서울 강남구 테헤란로 517 현대백화점 무역센터점 (네비에 "현대백화점 무역센터점 주차장" 검색)', contact: '' },
-  { name: '본사', addr: '서울 중구 청계천로 100 시그니처타워 서관 1040호', contact: '' },
+  { name: '모두먼트', short: '모두먼트', addr: '경기 이천시 마장면 프리미엄아울렛로 33-48 A동 2층 모두먼트', contact: '배준혁 010-5582-2921' },
+  { name: '삼우에프앤지', short: '냉장창고', addr: '경기 김포시 고촌읍 아라육로57번길 15 삼우 에프앤지', contact: '출고 현장 관리자 031-996-5404' },
+  { name: '일산창고', short: '일산창고', addr: '경기 고양시 덕양구 통일로 1031번길 458 대양물류보관창고(컨테이너창고)', contact: '창고 담당자 010-5472-6111' },
+  { name: '신세계 강남', short: '신강', addr: '서울 서초구 신반포로 176 신세계백화점 강남점 스위트파크 지하1층 산스sans', contact: '' },
+  { name: '산스 익선', short: '익선점', addr: '서울 종로구 수표로28길 30 산스 sans', contact: '' },
+  { name: '본사', short: '본사', addr: '서울 중구 청계천로 100 시그니처타워 서관 1040호', contact: '' },
 ];
 const FROM_NOTICES = [
   { id: 'fn_carry', title: '출발지 주소까지 오셔서 직접 운반 필요', body: '출발지 주소까지 오셔서 직접 픽업하여 가져가셔야 합니다.' },
@@ -292,12 +312,51 @@ const TO_NOTICES = [
   { id: 'tn_contact', title: '도착 전 연락 필수', body: '픽업 장소 도착 전 담당자에게 미리 연락해주세요.' },
 ];
 
+const CONTACTS = [
+  { name: '김경훈', tel: '010-8261-3027' },
+  { name: '김도연', tel: '010-2012-0826' },
+  { name: '김도형', tel: '010-9449-9715' },
+  { name: '김은비', tel: '010-8581-7548' },
+  { name: '김태린', tel: '010-2707-2327' },
+  { name: '조서하', tel: '010-4454-8862' },
+  { name: '이나겸', tel: '010-7216-9274' },
+  { name: '이재강', tel: '010-6366-0061' },
+  { name: '이준상', tel: '010-8668-1019' },
+  { name: '이혜빈', tel: '010-3520-9405' },
+  { name: '인나래', tel: '010-4107-0906' },
+];
+
+function buildContactBtns(containerId, inputId) {
+  const wrap = document.getElementById(containerId);
+  const input = document.getElementById(inputId);
+  CONTACTS.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'contact-btn';
+    btn.textContent = c.name;
+    btn.addEventListener('click', () => {
+      if (btn.classList.contains('sel')) {
+        btn.classList.remove('sel');
+        input.value = '';
+      } else {
+        wrap.querySelectorAll('.contact-btn').forEach(b => b.classList.remove('sel'));
+        btn.classList.add('sel');
+        input.value = c.name + ' ' + c.tel;
+      }
+    });
+    wrap.appendChild(btn);
+  });
+}
+
+buildContactBtns('from-contact-btns', 'from-contact');
+buildContactBtns('to-contact-btns', 'to-contact');
+
 const state = { pay: '월정산' };
 const selectedFromNotices = new Set();
 const selectedToNotices = new Set();
 
-function checkSansAddr(addr, autoId) {
-  document.getElementById(autoId).style.display = addr.includes(SANS_KEYWORD) ? 'block' : 'none';
+function checkSpecialAddr(addr, sansAutoId, shinsegaeAutoId) {
+  document.getElementById(sansAutoId).style.display = addr.includes(SANS_KEYWORD) ? 'block' : 'none';
+  document.getElementById(shinsegaeAutoId).style.display = addr.includes(SHINSEGAE_KEYWORD) ? 'block' : 'none';
 }
 
 function buildTimeSelect(id) {
@@ -337,8 +396,27 @@ buildTimeSelect('to-time');
 setupQuickTime('from-quick', 'from-dt-fields', 'fromMode');
 setupQuickTime('to-quick', 'to-dt-fields', 'toMode');
 
-document.getElementById('from-addr').addEventListener('input', e => checkSansAddr(e.target.value, 'from-auto-notice'));
-document.getElementById('to-addr').addEventListener('input', e => checkSansAddr(e.target.value, 'to-auto-notice'));
+document.getElementById('from-addr').addEventListener('input', e => {
+  checkSpecialAddr(e.target.value, 'from-auto-notice', 'from-shinsegae-notice');
+  document.getElementById('from-presets').querySelectorAll('.preset-btn').forEach(b => b.classList.remove('sel'));
+  document.getElementById('from-contact-btns').querySelectorAll('.contact-btn').forEach(b => b.disabled = false);
+  state.fromShort = null;
+});
+document.getElementById('to-addr').addEventListener('input', e => {
+  checkSpecialAddr(e.target.value, 'to-auto-notice', 'to-shinsegae-notice');
+  document.getElementById('to-presets').querySelectorAll('.preset-btn').forEach(b => b.classList.remove('sel'));
+  document.getElementById('to-contact-btns').querySelectorAll('.contact-btn').forEach(b => b.disabled = false);
+  state.toShort = null;
+});
+
+const AUTO_CONTACT_PRESETS = ['모두먼트', '삼우에프앤지', '일산창고'];
+
+function setContactBtnsDisabled(containerId, disabled) {
+  document.getElementById(containerId).querySelectorAll('.contact-btn').forEach(b => {
+    b.disabled = disabled;
+    if (disabled) b.classList.remove('sel');
+  });
+}
 
 function buildPresets(containerId, type) {
   const el = document.getElementById(containerId);
@@ -350,17 +428,25 @@ function buildPresets(containerId, type) {
       const addrId = type === 'from' ? 'from-addr' : 'to-addr';
       const contactId = type === 'from' ? 'from-contact' : 'to-contact';
       const autoId = type === 'from' ? 'from-auto-notice' : 'to-auto-notice';
+      const shinsegaeId = type === 'from' ? 'from-shinsegae-notice' : 'to-shinsegae-notice';
+      const contactBtnsId = type === 'from' ? 'from-contact-btns' : 'to-contact-btns';
       if (btn.classList.contains('sel')) {
         btn.classList.remove('sel');
         document.getElementById(addrId).value = '';
         document.getElementById(contactId).value = '';
-        checkSansAddr('', autoId);
+        checkSpecialAddr('', autoId, shinsegaeId);
+        setContactBtnsDisabled(contactBtnsId, false);
+        if (type === 'from') state.fromShort = null;
+        else state.toShort = null;
       } else {
         el.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('sel'));
         btn.classList.add('sel');
         document.getElementById(addrId).value = p.addr;
         document.getElementById(contactId).value = p.contact;
-        checkSansAddr(p.addr, autoId);
+        checkSpecialAddr(p.addr, autoId, shinsegaeId);
+        setContactBtnsDisabled(contactBtnsId, AUTO_CONTACT_PRESETS.includes(p.name));
+        if (type === 'from') state.fromShort = p.short;
+        else state.toShort = p.short;
       }
     });
     el.appendChild(btn);
@@ -466,16 +552,32 @@ function generate() {
 
   const fromSans = state.fromAddr && state.fromAddr.includes(SANS_KEYWORD);
   const toSans = state.toAddr && state.toAddr.includes(SANS_KEYWORD);
+  const fromShinsegae = state.fromAddr && state.fromAddr.includes(SHINSEGAE_KEYWORD);
+  const toShinsegae = state.toAddr && state.toAddr.includes(SHINSEGAE_KEYWORD);
   const fromNoticeLines = [
     ...FROM_NOTICES.filter(n => selectedFromNotices.has(n.id)).map(n => '  ⚠ ' + n.body),
-    ...(fromSans ? ['  ' + SANS_NOTICE] : [])
+    ...(fromSans ? ['  ' + SANS_NOTICE] : []),
+    ...(fromShinsegae ? ['  ' + SHINSEGAE_NOTICE] : [])
   ].join('\n');
   const toNoticeLines = [
     ...TO_NOTICES.filter(n => selectedToNotices.has(n.id)).map(n => '  ⚠ ' + n.body),
-    ...(toSans ? ['  ' + SANS_NOTICE] : [])
+    ...(toSans ? ['  ' + SANS_NOTICE] : []),
+    ...(toShinsegae ? ['  ' + SHINSEGAE_NOTICE] : [])
   ].join('\n');
 
-  let msg = '🚚 퀵 배송 요청\n';
+  function addrShort(presetShort, addr) {
+    if (presetShort) return presetShort;
+    const parts = addr.trim().split(/\s+/).slice(0, 2);
+    const cleaned = parts.map(p => {
+      const r = p.replace(/(?<=.)(특별시|광역시|특별자치시|특별자치도|시|도|군|구)$/, '');
+      return r.length >= 2 ? r : p;
+    });
+    return cleaned.join('');
+  }
+  const fromShort = addrShort(state.fromShort, state.fromAddr);
+  const toShort = addrShort(state.toShort, state.toAddr);
+  const summary = [fromShort, toShort].filter(Boolean).join('→');
+  let msg = '🚚' + summary + '\n';
   msg += '─────────────────\n';
   msg += '📦 물품: ' + state.item + '\n';
   msg += '  차량: ' + state.vehicle + '\n';
