@@ -5,125 +5,580 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>퀵 배송 요청</title>
 <style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+
+:root {
+  --sans-mint: #C0FFEE;
+  --sans-mint-tint: #E4FBF4;
+  --sans-mint-deep: #6BD4B5;
+  --sans-black: #000000;
+  --sans-white: #FFFFFF;
+  --gray-50:  #FAFAFA;
+  --gray-100: #F4F4F4;
+  --gray-200: #EAEAEA;
+  --gray-300: #DCDCDC;
+  --gray-500: #9A9A9A;
+  --gray-700: #555555;
+  --gray-900: #1A1A1A;
+  --error-red: #E24B4A;
+  --error-red-tint: #FDECEC;
+  --font-display: 'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
+  --font-body: 'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', 'Consolas', 'D2Coding', monospace;
+  --ease-quiet: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-  background: #f5f5f0;
+  font-family: var(--font-body);
+  background: var(--gray-50);
+  color: var(--sans-black);
   min-height: 100vh;
   display: flex;
   justify-content: center;
   padding: 2rem 1rem 4rem;
+  -webkit-font-smoothing: antialiased;
 }
 .wrap {
   width: 100%;
   max-width: 540px;
-  background: #fff;
-  border-radius: 16px;
-  padding: 2rem 1.5rem;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  background: var(--sans-white);
+  border-radius: 4px;
+  padding: 2.5rem 1.75rem;
+  border: 1px solid var(--gray-200);
 }
-h1 { font-size: 18px; font-weight: 600; color: #111; margin-bottom: 1.75rem; }
-.progress { display: flex; gap: 6px; margin-bottom: 1.75rem; }
-.dot { height: 3px; flex: 1; border-radius: 2px; background: #e0e0e0; transition: background 0.2s; }
-.dot.done { background: #3B8BEB; }
+
+/* Header */
+h1 {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--sans-black);
+  margin-bottom: 1.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Progress */
+.progress { display: flex; gap: 4px; margin-bottom: 2rem; }
+.dot { height: 2px; flex: 1; background: var(--gray-200); transition: background 0.4s var(--ease-quiet); }
+.dot.done { background: var(--sans-black); }
+
+/* Steps */
 .step { display: none; }
 .step.active { display: block; }
-.step-label { font-size: 11px; color: #aaa; margin-bottom: 4px; letter-spacing: 0.05em; text-transform: uppercase; }
-.step-title { font-size: 18px; font-weight: 600; color: #111; margin-bottom: 1.25rem; }
-.field { margin-bottom: 1.1rem; }
-.field label { font-size: 13px; color: #666; display: block; margin-bottom: 5px; }
-.req { color: #E24B4A; margin-left: 2px; }
+.step-label {
+  font-size: 10px;
+  color: var(--gray-500);
+  margin-bottom: 6px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.step-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--sans-black);
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+/* Fields */
+.field { margin-bottom: 1.25rem; }
+.field label {
+  font-size: 11px;
+  color: var(--gray-700);
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.req { color: var(--error-red); margin-left: 2px; font-weight: 800; }
 .field input, .field select {
-  width: 100%; padding: 10px 12px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  width: 100%; padding: 12px 14px;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
   font-size: 14px;
-  background: #fff;
-  color: #111;
+  background: var(--sans-white);
+  color: var(--sans-black);
   font-family: inherit;
   appearance: auto;
+  transition: border-color 0.2s var(--ease-quiet), background 0.2s var(--ease-quiet);
 }
-.field input.err-field { border-color: #E24B4A; }
-.field input:focus, .field select:focus { outline: none; border-color: #3B8BEB; }
+.field input::placeholder { color: var(--gray-500); }
+.field input.err-field { border-color: var(--error-red); background: var(--error-red-tint); }
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none;
+  border-color: var(--sans-black);
+  background: var(--sans-white);
+}
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.sec-divider { font-size: 11px; font-weight: 600; color: #aaa; margin: 1.25rem 0 0.75rem; padding-top: 1.1rem; border-top: 1px solid #f0f0f0; letter-spacing: 0.05em; text-transform: uppercase; }
-.vehicle-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; margin-bottom: 1.1rem; }
-.vcard { padding: 10px 11px; border-radius: 8px; border: 1px solid #e0e0e0; cursor: pointer; background: #fff; transition: all 0.15s; }
-.vcard:hover { border-color: #aaa; }
-.vcard.sel { border: 2px solid #3B8BEB; background: #EBF3FD; }
-.vcard.err-field { border-color: #E24B4A; }
-.vcard .vname { font-size: 13px; font-weight: 600; color: #111; }
-.vcard .vdesc { font-size: 11px; color: #888; margin-top: 2px; }
-.vcard.sel .vname { color: #1a6bc4; }
-.vcard.sel .vdesc { color: #1a6bc4; opacity: 0.75; }
-.preset-grid { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.1rem; }
+
+/* Section dividers */
+.sec-divider {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gray-500);
+  margin: 1.5rem 0 0.85rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--gray-200);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Vehicle grid */
+.vehicle-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 1.25rem; }
+.vcard {
+  padding: 12px 10px;
+  border-radius: 4px;
+  background: var(--gray-100);
+  cursor: pointer;
+  transition: background 0.2s var(--ease-quiet), color 0.2s var(--ease-quiet);
+  border: 1px solid transparent;
+}
+.vcard:hover { background: var(--gray-200); }
+.vcard.sel {
+  background: var(--sans-black);
+  border-color: var(--sans-black);
+}
+.vcard.err-field { background: var(--error-red-tint); box-shadow: inset 0 0 0 1px var(--error-red); }
+.vcard .vname { font-size: 13px; font-weight: 700; color: var(--sans-black); letter-spacing: -0.01em; }
+.vcard .vdesc { font-size: 10px; color: var(--gray-500); margin-top: 3px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 500; }
+.vcard.sel .vname { color: var(--sans-mint); }
+.vcard.sel .vdesc { color: var(--sans-mint); opacity: 0.7; }
+
+/* Preset list */
+.preset-grid { display: flex; flex-direction: column; gap: 4px; margin-bottom: 1.25rem; }
 .preset-btn {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 13px; border-radius: 8px; border: 1px solid #e0e0e0;
-  cursor: pointer; background: #fff; transition: all 0.15s; text-align: left; width: 100%;
+  padding: 12px 14px;
+  border-radius: 4px;
+  background: var(--gray-100);
+  cursor: pointer;
+  transition: background 0.2s var(--ease-quiet), color 0.2s var(--ease-quiet);
+  text-align: left;
+  width: 100%;
+  border: none;
 }
-.preset-btn:hover { border-color: #3B8BEB; background: #EBF3FD; }
-.preset-btn.sel { border: 2px solid #3B8BEB; background: #EBF3FD; }
-.preset-name { font-size: 14px; font-weight: 600; color: #111; }
-.preset-addr { font-size: 12px; color: #888; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 360px; }
-.preset-btn.sel .preset-name { color: #1a6bc4; }
-.preset-btn.sel .preset-addr { color: #1a6bc4; opacity: 0.75; }
-.preset-arrow { font-size: 13px; color: #ccc; margin-left: 8px; flex-shrink: 0; }
-.pill-group { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; }
+.preset-btn:hover { background: var(--gray-200); }
+.preset-btn.sel { background: var(--sans-black); }
+.preset-name { font-size: 13px; font-weight: 700; color: var(--sans-black); letter-spacing: -0.01em; }
+.preset-addr {
+  font-size: 11px;
+  color: var(--gray-500);
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 360px;
+}
+.preset-btn.sel .preset-name { color: var(--sans-mint); }
+.preset-btn.sel .preset-addr { color: var(--sans-mint); opacity: 0.7; }
+.preset-arrow { font-size: 13px; color: var(--gray-300); margin-left: 8px; flex-shrink: 0; }
+.preset-btn.sel .preset-arrow { color: var(--sans-mint); }
+
+/* Pills */
+.pill-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 .pill {
-  padding: 7px 13px; border-radius: 999px; border: 1px solid #e0e0e0;
-  font-size: 13px; cursor: pointer; background: #fff; color: #666;
-  transition: all 0.15s; white-space: nowrap; font-family: inherit;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--gray-300);
+  font-size: 12px;
+  cursor: pointer;
+  background: var(--sans-white);
+  color: var(--gray-700);
+  transition: all 0.2s var(--ease-quiet);
+  white-space: nowrap;
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
-.pill:hover { border-color: #aaa; color: #111; }
-.pill.sel { background: #EBF3FD; color: #1a6bc4; border-color: #3B8BEB; font-weight: 600; }
-.pill.err-field { border-color: #E24B4A; }
-.datetime-wrap { margin-bottom: 1.1rem; }
-.datetime-wrap > label { font-size: 13px; color: #666; display: block; margin-bottom: 5px; }
+.pill:hover { border-color: var(--sans-black); color: var(--sans-black); }
+.pill.sel {
+  background: var(--sans-black);
+  color: var(--sans-mint);
+  border-color: var(--sans-black);
+  font-weight: 700;
+}
+.pill.err-field { border-color: var(--error-red); background: var(--error-red-tint); color: var(--error-red); }
+
+.datetime-wrap { margin-bottom: 1.25rem; }
+.datetime-wrap > label {
+  font-size: 11px;
+  color: var(--gray-700);
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
 .dt-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.notice-cards { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.1rem; }
-.notice-card { padding: 10px 13px; border-radius: 8px; border: 1px solid #e0e0e0; cursor: pointer; background: #fff; transition: all 0.15s; }
-.notice-card:hover { border-color: #aaa; }
-.notice-card.sel { border: 2px solid #3B8BEB; background: #EBF3FD; }
-.notice-card .ntitle { font-size: 13px; font-weight: 600; color: #111; margin-bottom: 3px; }
-.notice-card .nbody { font-size: 12px; color: #888; line-height: 1.55; }
-.notice-card.sel .ntitle { color: #1a6bc4; }
-.notice-card.sel .nbody { color: #1a6bc4; opacity: 0.8; }
-.auto-notice { padding: 10px 13px; border-radius: 8px; border: 1.5px dashed #3B8BEB; background: #EBF3FD; margin-bottom: 1.1rem; }
-.auto-notice .alabel { font-size: 11px; font-weight: 600; color: #1a6bc4; margin-bottom: 4px; }
-.auto-notice .abody { font-size: 12px; color: #1a6bc4; line-height: 1.55; opacity: 0.85; }
-.section-bar { height: 1px; background: #f0f0f0; margin: 1.5rem 0; }
-.tag-opt { font-size: 11px; padding: 2px 7px; border-radius: 999px; background: #f5f5f5; color: #aaa; border: 1px solid #e8e8e8; display: inline-block; margin-left: 5px; vertical-align: middle; }
-.err-msg { font-size: 12px; color: #E24B4A; margin-top: 5px; display: none; }
+
+/* Notice cards */
+.notice-cards { display: flex; flex-direction: column; gap: 4px; margin-bottom: 1.25rem; }
+.notice-card {
+  padding: 12px 14px;
+  border-radius: 4px;
+  background: var(--gray-100);
+  cursor: pointer;
+  transition: background 0.2s var(--ease-quiet);
+  border: none;
+}
+.notice-card:hover { background: var(--gray-200); }
+.notice-card.sel { background: var(--sans-black); }
+.notice-card .ntitle { font-size: 12px; font-weight: 700; color: var(--sans-black); margin-bottom: 4px; letter-spacing: -0.005em; }
+.notice-card .nbody { font-size: 11px; color: var(--gray-500); line-height: 1.6; }
+.notice-card.sel .ntitle { color: var(--sans-mint); }
+.notice-card.sel .nbody { color: var(--sans-mint); opacity: 0.75; }
+
+/* Auto-notice (special address) */
+.auto-notice {
+  padding: 12px 14px;
+  border-radius: 4px;
+  background: var(--sans-mint-tint);
+  border-left: 3px solid var(--sans-mint-deep);
+  margin-bottom: 1.25rem;
+}
+.auto-notice .alabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.auto-notice .abody { font-size: 11px; color: var(--gray-900); line-height: 1.6; opacity: 0.85; }
+
+.section-bar { height: 1px; background: var(--gray-200); margin: 1.75rem 0; }
+.tag-opt {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--gray-100);
+  color: var(--gray-500);
+  display: inline-block;
+  margin-left: 6px;
+  vertical-align: middle;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.err-msg {
+  font-size: 11px;
+  color: var(--error-red);
+  margin-top: 6px;
+  display: none;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Buttons */
 .btn-row { display: flex; gap: 8px; }
-.btn { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #e0e0e0; font-size: 15px; cursor: pointer; background: #fff; color: #333; font-family: inherit; transition: all 0.15s; }
-.btn:hover { background: #f5f5f5; }
-.btn.primary { background: #3B8BEB; color: #fff; border-color: #3B8BEB; font-weight: 600; }
-.btn.primary:hover { background: #2a7ad4; }
-.result-box { background: #f9f9f7; border-radius: 10px; border: 1px solid #e8e8e8; padding: 1rem 1.25rem; margin-bottom: 1rem; }
-.result-box pre { font-family: inherit; font-size: 13px; white-space: pre-wrap; line-height: 1.85; color: #222; }
-.copy-btn { width: 100%; padding: 13px; border-radius: 8px; border: none; background: #3B8BEB; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.15s; }
-.copy-btn:hover { background: #2a7ad4; }
-.copy-btn.done { background: #27ae60; }
-.result-nav { display: flex; gap: 8px; margin-top: 10px; }
-.nav-btn { flex: 1; padding: 10px 6px; border-radius: 8px; border: 1px solid #e0e0e0; font-size: 12px; cursor: pointer; background: #fff; color: #666; font-family: inherit; text-align: center; line-height: 1.4; transition: all 0.15s; }
-.nav-btn:hover { background: #f5f5f5; color: #111; }
-.contact-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-.contact-btn { padding: 5px 11px; border-radius: 999px; border: 1px solid #e0e0e0; font-size: 12px; cursor: pointer; background: #fff; color: #555; font-family: inherit; transition: all 0.15s; white-space: nowrap; }
-.contact-btn:hover { border-color: #aaa; color: #111; }
-.contact-btn:disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+.btn {
+  flex: 1;
+  padding: 14px;
+  border-radius: 999px;
+  border: 1px solid var(--sans-black);
+  font-size: 13px;
+  cursor: pointer;
+  background: var(--sans-white);
+  color: var(--sans-black);
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: background 0.2s var(--ease-quiet), color 0.2s var(--ease-quiet);
+}
+.btn:hover { background: var(--gray-100); }
+.btn.primary {
+  background: var(--sans-black);
+  color: var(--sans-white);
+  border-color: var(--sans-black);
+}
+.btn.primary:hover {
+  background: var(--sans-mint);
+  color: var(--sans-black);
+  border-color: var(--sans-mint);
+}
+
+/* Result box */
+.result-box {
+  background: var(--gray-100);
+  border-radius: 4px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 0.75rem;
+  transition: background 0.3s var(--ease-quiet), box-shadow 0.3s var(--ease-quiet);
+  border: 1px solid transparent;
+}
+.result-box.editing {
+  background: var(--sans-mint-tint);
+  border-color: var(--sans-mint-deep);
+  box-shadow: 0 0 0 4px rgba(192, 255, 238, 0.35);
+}
+.result-box pre {
+  font-family: inherit;
+  font-size: 13px;
+  white-space: pre-wrap;
+  line-height: 1.85;
+  color: var(--gray-900);
+}
+.result-box textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  resize: vertical;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.95;
+  color: var(--sans-black);
+  font-weight: 500;
+  min-height: 280px;
+  padding: 0;
+  outline: none;
+  caret-color: var(--sans-mint-deep);
+}
+.editing-hint {
+  display: none;
+  font-size: 10px;
+  color: var(--sans-black);
+  font-weight: 700;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  background: var(--sans-mint);
+  border-radius: 4px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.editing-hint.visible { display: block; }
+
+/* Edit toggle row */
+.edit-toggle-row { display: flex; justify-content: flex-end; align-items: center; gap: 6px; margin-bottom: 0.6rem; }
+.edit-toggle {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--gray-300);
+  font-size: 11px;
+  cursor: pointer;
+  background: var(--sans-white);
+  color: var(--gray-700);
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: all 0.2s var(--ease-quiet);
+}
+.edit-toggle:hover { border-color: var(--sans-black); color: var(--sans-black); }
+.edit-toggle.editing {
+  background: var(--sans-black);
+  color: var(--sans-mint);
+  border-color: var(--sans-black);
+  font-weight: 700;
+}
+.revert-btn {
+  display: none;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--gray-300);
+  font-size: 11px;
+  cursor: pointer;
+  background: var(--sans-white);
+  color: var(--gray-500);
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: all 0.2s var(--ease-quiet);
+}
+.revert-btn:hover { border-color: var(--sans-black); color: var(--sans-black); }
+.revert-btn.visible { display: inline-block; }
+
+/* Copy button */
+.copy-btn {
+  width: 100%;
+  padding: 15px;
+  border-radius: 999px;
+  border: 1px solid var(--sans-black);
+  background: var(--sans-black);
+  color: var(--sans-white);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: background 0.2s var(--ease-quiet), color 0.2s var(--ease-quiet);
+}
+.copy-btn:hover {
+  background: var(--sans-mint);
+  color: var(--sans-black);
+}
+.copy-btn.done {
+  background: var(--sans-mint);
+  color: var(--sans-black);
+  border-color: var(--sans-mint);
+}
+
+/* Result nav */
+.result-nav { display: flex; gap: 6px; margin-top: 12px; }
+.nav-btn {
+  flex: 1;
+  padding: 12px 6px;
+  border-radius: 4px;
+  background: var(--gray-100);
+  font-size: 10px;
+  cursor: pointer;
+  color: var(--gray-700);
+  font-family: inherit;
+  text-align: center;
+  line-height: 1.5;
+  transition: background 0.2s var(--ease-quiet), color 0.2s var(--ease-quiet);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: none;
+}
+.nav-btn:hover { background: var(--sans-black); color: var(--sans-mint); }
+
+/* Contact buttons */
+.contact-btns { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+.contact-btn {
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--gray-300);
+  font-size: 11px;
+  cursor: pointer;
+  background: var(--sans-white);
+  color: var(--gray-700);
+  font-family: inherit;
+  transition: all 0.2s var(--ease-quiet);
+  white-space: nowrap;
+  font-weight: 500;
+}
+.contact-btn:hover { border-color: var(--sans-black); color: var(--sans-black); }
+.contact-btn.sel {
+  background: var(--sans-black);
+  color: var(--sans-mint);
+  border-color: var(--sans-black);
+  font-weight: 700;
+}
+.contact-btn:disabled { opacity: 0.25; cursor: not-allowed; pointer-events: none; }
+
+/* Waypoint card */
+.waypoint-card {
+  background: var(--gray-100);
+  border-radius: 4px;
+  padding: 1.25rem 1.25rem 0.5rem;
+  margin-bottom: 0.85rem;
+  position: relative;
+}
+.waypoint-card .wp-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.waypoint-card .wp-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--sans-black);
+  display: flex; align-items: center; gap: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.waypoint-card .wp-num-badge {
+  background: var(--sans-black);
+  color: var(--sans-mint);
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+}
+.wp-remove-btn {
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--gray-300);
+  background: var(--sans-white);
+  color: var(--gray-700);
+  font-size: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s var(--ease-quiet);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.wp-remove-btn:hover {
+  background: var(--sans-black);
+  color: var(--sans-white);
+  border-color: var(--sans-black);
+}
+.waypoint-card .wp-sub-divider {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gray-500);
+  margin: 1rem 0 0.6rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--gray-200);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.waypoint-card .wp-sub-divider:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+.waypoint-card .preset-grid { margin-bottom: 0.85rem; }
+.waypoint-card .preset-addr { max-width: 280px; }
+.waypoint-card .preset-btn { background: var(--sans-white); }
+.waypoint-card .preset-btn:hover { background: var(--gray-200); }
+.waypoint-card .notice-card { background: var(--sans-white); }
+.waypoint-card .notice-card:hover { background: var(--gray-200); }
+.waypoint-card .field input, .waypoint-card .field select { background: var(--sans-white); }
+
+/* Add waypoint button */
+.add-waypoint-btn {
+  width: 100%;
+  padding: 13px;
+  border-radius: 999px;
+  border: 1px dashed var(--sans-black);
+  background: var(--sans-white);
+  color: var(--sans-black);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s var(--ease-quiet), color 0.2s var(--ease-quiet);
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.add-waypoint-btn:hover {
+  background: var(--sans-mint);
+  border-style: solid;
+}
+
+/* Destination heading */
+.dest-section-heading {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--sans-black);
+  margin: 0.5rem 0 1rem;
+  display: flex; align-items: center; gap: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.dest-section-heading::before {
+  content: '📍'; font-size: 14px;
+}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:1.75rem;">
     <h1 style="margin-bottom:0;">🚚 퀵 배송 요청</h1>
-    <span style="font-size:11px; color:#ccc;">v2026.05.15</span>
+    <span style="font-size:10px; color:var(--gray-500); letter-spacing:0.08em; font-weight:600;">v2026.05.20</span>
   </div>
   <div class="progress">
     <div class="dot done" id="d0"></div>
     <div class="dot" id="d1"></div>
     <div class="dot" id="d2"></div>
+    <div class="dot" id="d3"></div>
   </div>
 
   <!-- Step 0: 물품 + 차량 -->
@@ -177,7 +632,7 @@ h1 { font-size: 18px; font-weight: 600; color: #111; margin-bottom: 1.75rem; }
       <div class="contact-btns" id="from-contact-btns" style="margin-top:8px; margin-bottom:0;"></div>
     </div>
     <div class="datetime-wrap">
-      <label>픽업 일시<span class="req" style="color:#E24B4A;">*</span></label>
+      <label>픽업 일시<span class="req" style="color:var(--error-red);">*</span></label>
       <div class="pill-group" id="from-quick">
         <div class="pill" data-mode="immediate">즉시 요청</div>
         <div class="pill" data-mode="pick">날짜/시간 선택</div>
@@ -216,10 +671,20 @@ h1 { font-size: 18px; font-weight: 600; color: #111; margin-bottom: 1.75rem; }
     </div>
   </div>
 
-  <!-- Step 2: 도착지 -->
+  <!-- Step 2: 경유지(선택) + 도착지 -->
   <div class="step" id="s2">
     <div class="step-label">3단계</div>
-    <div class="step-title">도착지 (배송)</div>
+    <div class="step-title">경유지 & 도착지</div>
+
+    <!-- Waypoints inline area -->
+    <div id="waypoints-area"></div>
+
+    <!-- Add waypoint button (sits right above 도착지) -->
+    <button class="add-waypoint-btn" id="add-waypoint-btn">+ 경유지 추가</button>
+
+    <!-- 도착지 heading -->
+    <div class="dest-section-heading">도착지 (배송)</div>
+
     <div class="sec-divider" style="margin-top:0; border-top:none; padding-top:0;">자주 쓰는 주소</div>
     <div class="preset-grid" id="to-presets"></div>
     <div class="field">
@@ -232,7 +697,7 @@ h1 { font-size: 18px; font-weight: 600; color: #111; margin-bottom: 1.75rem; }
       <div class="contact-btns" id="to-contact-btns" style="margin-top:8px; margin-bottom:0;"></div>
     </div>
     <div class="datetime-wrap">
-      <label>도착 희망 일시<span class="req" style="color:#E24B4A;">*</span></label>
+      <label>도착 희망 일시<span class="req" style="color:var(--error-red);">*</span></label>
       <div class="pill-group" id="to-quick">
         <div class="pill" data-mode="asap">최대한 빠르게</div>
         <div class="pill" data-mode="pick">날짜/시간 선택</div>
@@ -271,6 +736,7 @@ h1 { font-size: 18px; font-weight: 600; color: #111; margin-bottom: 1.75rem; }
     <div class="err-msg" id="err2-addr">배송 주소를 입력해주세요.</div>
     <div class="err-msg" id="err2-contact">수령인/연락처를 입력해주세요.</div>
     <div class="err-msg" id="err2-dt">도착 희망 일시를 선택해주세요.</div>
+    <div class="err-msg" id="err2-waypoint">경유지 정보를 모두 입력해주세요.</div>
     <div class="btn-row">
       <button class="btn" onclick="goTo(1)">이전</button>
       <button class="btn primary" onclick="generate()">메시지 만들기</button>
@@ -281,12 +747,20 @@ h1 { font-size: 18px; font-weight: 600; color: #111; margin-bottom: 1.75rem; }
   <div class="step" id="s3">
     <div class="step-label">완성</div>
     <div class="step-title">카톡에 붙여넣기 하세요</div>
-    <div class="result-box"><pre id="result-text"></pre></div>
+    <div class="edit-toggle-row">
+      <button class="revert-btn" id="revert-btn" title="원본 메시지로 되돌립니다">↺ 원복</button>
+      <button class="edit-toggle" id="edit-toggle">✎ 직접 수정</button>
+    </div>
+    <div class="editing-hint" id="editing-hint">✏️ 편집 중 — 메시지를 직접 수정하세요. 완료 후 위 버튼을 누르세요.</div>
+    <div class="result-box" id="result-box">
+      <pre id="result-text"></pre>
+      <textarea id="result-textarea" style="display:none;"></textarea>
+    </div>
     <button class="copy-btn" id="copy-btn" onclick="copyMsg()">복사하기</button>
     <div class="result-nav">
       <div class="nav-btn" onclick="goTo(0)">물품 정보 &<br>차량 수정</div>
       <div class="nav-btn" onclick="goTo(1)">출발지<br>정보 수정</div>
-      <div class="nav-btn" onclick="goTo(2)">도착지<br>정보 수정</div>
+      <div class="nav-btn" onclick="goTo(2)">경유지·도착지<br>정보 수정</div>
     </div>
   </div>
 </div>
@@ -295,7 +769,7 @@ h1 { font-size: 18px; font-weight: 600; color: #111; margin-bottom: 1.75rem; }
 const SANS_KEYWORD = '수표로28길';
 const SANS_NOTICE = '오시는 길: 낙원상가에서 나오시다가 좌측에 익선동 노가리마켓 보이면 차 세우고, 부산오뎅과 노가리마켓 사이 골목으로 들어와주세요! 갈림길에서 우측으로 쭉 직진하셔서 벽면에 스테인리스 붙어있는 건물입니다.';
 const SHINSEGAE_KEYWORD = '신반포로 176';
-const SHINSEGAE_NOTICE = '매장 안쪽까지 이동 거리가 있습니다. 끌 차(핸드트럭) 필수 지참 부탁드리며, 물건을 끝까지 성실하게 운반해주실 기사님을 요청드립니다.';;
+const SHINSEGAE_NOTICE = '매장 안쪽까지 이동 거리가 있습니다. 끌 차(핸드트럭) 필수 지참 부탁드리며, 물건을 끝까지 성실하게 운반해주실 기사님을 요청드립니다.';
 const PRESETS = [
   { name: '모두먼트', short: '모두먼트', addr: '경기 이천시 마장면 프리미엄아울렛로 33-48 A동 2층 모두먼트', contact: '배준혁 010-5582-2921' },
   { name: '삼우에프앤지', short: '냉장창고', addr: '경기 김포시 고촌읍 아라육로57번길 15 삼우 에프앤지', contact: '출고 현장 관리자 031-996-5404' },
@@ -314,6 +788,7 @@ const TO_NOTICES = [
   { id: 'tn_time', title: '도착 시간 엄수 — 조기 하차 불가', body: '안내드린 시간에 맞춰 도착해주세요. 일찍 도착하셔도 수령 담당자가 없을 수 있으니, 지정 시간 전 임의로 하차하지 말아 주시기 바랍니다.' },
   { id: 'tn_contact', title: '도착 전 연락 필수', body: '하차 장소 도착 전 담당자에게 미리 연락해주세요.' },
 ];
+const WAYPOINT_NOTICES = TO_NOTICES; // same as 도착지
 
 const CONTACTS = [
   { name: '김경훈', tel: '010-8261-3027' },
@@ -328,6 +803,15 @@ const CONTACTS = [
   { name: '이혜빈', tel: '010-3520-9405' },
   { name: '인나래', tel: '010-4107-0906' },
 ];
+const AUTO_CONTACT_PRESETS = ['모두먼트', '삼우에프앤지', '일산창고'];
+
+const state = { pay: '월정산', resultEditedText: null };
+const selectedFromNotices = new Set();
+const selectedToNotices = new Set();
+
+// Waypoints: array of { id, short, selectedNotices: Set, mode, refs: {...} }
+const waypoints = [];
+let waypointCounter = 0;
 
 function buildContactBtns(containerId, inputId) {
   const wrap = document.getElementById(containerId);
@@ -344,6 +828,7 @@ function buildContactBtns(containerId, inputId) {
         wrap.querySelectorAll('.contact-btn').forEach(b => b.classList.remove('sel'));
         btn.classList.add('sel');
         input.value = c.name + ' ' + c.tel;
+        clearInputError(input);
       }
     });
     wrap.appendChild(btn);
@@ -353,17 +838,15 @@ function buildContactBtns(containerId, inputId) {
 buildContactBtns('from-contact-btns', 'from-contact');
 buildContactBtns('to-contact-btns', 'to-contact');
 
-const state = { pay: '월정산' };
-const selectedFromNotices = new Set();
-const selectedToNotices = new Set();
-
 function checkSpecialAddr(addr, sansAutoId, shinsegaeAutoId) {
-  document.getElementById(sansAutoId).style.display = addr.includes(SANS_KEYWORD) ? 'block' : 'none';
-  document.getElementById(shinsegaeAutoId).style.display = addr.includes(SHINSEGAE_KEYWORD) ? 'block' : 'none';
+  const sansEl = typeof sansAutoId === 'string' ? document.getElementById(sansAutoId) : sansAutoId;
+  const shinEl = typeof shinsegaeAutoId === 'string' ? document.getElementById(shinsegaeAutoId) : shinsegaeAutoId;
+  if (sansEl) sansEl.style.display = addr.includes(SANS_KEYWORD) ? 'block' : 'none';
+  if (shinEl) shinEl.style.display = addr.includes(SHINSEGAE_KEYWORD) ? 'block' : 'none';
 }
 
-function buildTimeSelect(id) {
-  const sel = document.getElementById(id);
+function buildTimeSelect(elOrId) {
+  const sel = typeof elOrId === 'string' ? document.getElementById(elOrId) : elOrId;
   sel.innerHTML = '<option value="">시간 선택</option>';
   for (let h = 0; h < 24; h++) {
     for (let m of [0, 15, 30, 45]) {
@@ -412,10 +895,35 @@ document.getElementById('to-addr').addEventListener('input', e => {
   state.toShort = null;
 });
 
-const AUTO_CONTACT_PRESETS = ['모두먼트', '삼우에프앤지', '일산창고'];
+// 입력 시 에러 표시 자동 해제
+// input.value가 비어있지 않으면 err-field 클래스와 매칭된 err-msg를 즉시 숨김
+// input 이벤트뿐 아니라, 코드로 값이 세팅되는 경우에도 clearInputError(input)을 호출해서 사용
+const ERR_MSG_MAP = {
+  'item': 'err0-item',
+  'from-addr': 'err1-addr',
+  'from-contact': 'err1-contact',
+  'to-addr': 'err2-addr',
+  'to-contact': 'err2-contact',
+};
+function clearInputError(input) {
+  if (!input || !input.value || !input.value.trim()) return;
+  input.classList.remove('err-field');
+  const errId = ERR_MSG_MAP[input.id];
+  if (errId) {
+    const err = document.getElementById(errId);
+    if (err) err.style.display = 'none';
+  }
+}
+function attachAutoClearError(inputId) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  input.addEventListener('input', () => clearInputError(input));
+}
+Object.keys(ERR_MSG_MAP).forEach(attachAutoClearError);
 
-function setContactBtnsDisabled(containerId, disabled) {
-  document.getElementById(containerId).querySelectorAll('.contact-btn').forEach(b => {
+function setContactBtnsDisabled(containerOrId, disabled) {
+  const container = typeof containerOrId === 'string' ? document.getElementById(containerOrId) : containerOrId;
+  container.querySelectorAll('.contact-btn').forEach(b => {
     b.disabled = disabled;
     if (disabled) b.classList.remove('sel');
   });
@@ -448,6 +956,8 @@ function buildPresets(containerId, type) {
         document.getElementById(contactId).value = p.contact;
         checkSpecialAddr(p.addr, autoId, shinsegaeId);
         setContactBtnsDisabled(contactBtnsId, AUTO_CONTACT_PRESETS.includes(p.name));
+        clearInputError(document.getElementById(addrId));
+        clearInputError(document.getElementById(contactId));
         if (type === 'from') state.fromShort = p.short;
         else state.toShort = p.short;
       }
@@ -486,11 +996,213 @@ document.getElementById('vehicle-grid').querySelectorAll('.vcard').forEach(c => 
   });
 });
 
+// ===== Waypoint card builder =====
+function buildWaypointCard(wp) {
+  const card = document.createElement('div');
+  card.className = 'waypoint-card';
+  card.id = 'wp-' + wp.id;
+
+  card.innerHTML = `
+    <div class="wp-header">
+      <div class="wp-title">
+        <span class="wp-num-badge" data-role="num"></span>
+        <span>경유지 <span data-role="num-text"></span></span>
+      </div>
+      <button class="wp-remove-btn" data-action="remove">삭제</button>
+    </div>
+
+    <div class="wp-sub-divider">자주 쓰는 주소</div>
+    <div class="preset-grid" data-role="presets"></div>
+
+    <div class="field">
+      <label>경유지 주소<span class="req">*</span></label>
+      <input type="text" data-role="addr" placeholder="주소를 직접 입력하거나 위에서 선택하세요">
+    </div>
+    <div class="field">
+      <label>담당자 / 연락처<span class="req">*</span></label>
+      <input type="text" data-role="contact" placeholder="예) 홍길동 010-0000-0000">
+      <div class="contact-btns" data-role="contact-btns" style="margin-top:8px; margin-bottom:0;"></div>
+    </div>
+    <div class="datetime-wrap">
+      <label>경유 희망 일시<span class="req" style="color:var(--error-red);">*</span></label>
+      <div class="pill-group" data-role="quick">
+        <div class="pill" data-mode="asap">최대한 빠르게</div>
+        <div class="pill" data-mode="pick">날짜/시간 선택</div>
+      </div>
+      <div data-role="dt-fields" style="display:none;">
+        <div class="dt-row">
+          <div class="field" style="margin-bottom:0;"><input type="date" data-role="date"></div>
+          <div class="field" style="margin-bottom:0;"><select data-role="time"></select></div>
+        </div>
+      </div>
+    </div>
+    <div class="wp-sub-divider">경유지 특이사항</div>
+    <div data-role="sans-notice" style="display:none;">
+      <div class="auto-notice">
+        <div class="alabel">자동 감지 — 산스 (수표로28길 30)</div>
+        <div class="abody">${SANS_NOTICE}</div>
+      </div>
+    </div>
+    <div data-role="shinsegae-notice" style="display:none;">
+      <div class="auto-notice">
+        <div class="alabel">자동 감지 — 신세계 강남</div>
+        <div class="abody">${SHINSEGAE_NOTICE}</div>
+      </div>
+    </div>
+    <div class="notice-cards" data-role="notice-cards"></div>
+    <div class="field">
+      <label>경유 메모<span class="tag-opt">선택</span></label>
+      <input type="text" data-role="memo" placeholder="예) 1층 물류창고 앞, 사전 연락 필요">
+    </div>
+  `;
+
+  const addr = card.querySelector('[data-role="addr"]');
+  const contact = card.querySelector('[data-role="contact"]');
+  const contactBtns = card.querySelector('[data-role="contact-btns"]');
+  const presetsEl = card.querySelector('[data-role="presets"]');
+  const sansEl = card.querySelector('[data-role="sans-notice"]');
+  const shinsegaeEl = card.querySelector('[data-role="shinsegae-notice"]');
+  const noticeCardsEl = card.querySelector('[data-role="notice-cards"]');
+  const quickEl = card.querySelector('[data-role="quick"]');
+  const dtFieldsEl = card.querySelector('[data-role="dt-fields"]');
+  const dateEl = card.querySelector('[data-role="date"]');
+  const timeEl = card.querySelector('[data-role="time"]');
+  const memoEl = card.querySelector('[data-role="memo"]');
+  const removeBtn = card.querySelector('[data-action="remove"]');
+
+  wp.refs = { card, addr, contact, dateEl, timeEl, memoEl, quickEl, sansEl, shinsegaeEl, presetsEl, contactBtns, numBadge: card.querySelector('[data-role="num"]'), numText: card.querySelector('[data-role="num-text"]') };
+
+  // contact buttons
+  CONTACTS.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'contact-btn';
+    btn.textContent = c.name;
+    btn.addEventListener('click', () => {
+      if (btn.classList.contains('sel')) {
+        btn.classList.remove('sel');
+        contact.value = '';
+      } else {
+        contactBtns.querySelectorAll('.contact-btn').forEach(b => b.classList.remove('sel'));
+        btn.classList.add('sel');
+        contact.value = c.name + ' ' + c.tel;
+        if (contact.value.trim()) contact.classList.remove('err-field');
+      }
+    });
+    contactBtns.appendChild(btn);
+  });
+
+  // time select
+  buildTimeSelect(timeEl);
+
+  // presets
+  PRESETS.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn';
+    btn.innerHTML = `<div style="overflow:hidden;flex:1;min-width:0;"><div class="preset-name">${p.name}</div><div class="preset-addr">${p.addr}</div></div><span class="preset-arrow">→</span>`;
+    btn.addEventListener('click', () => {
+      if (btn.classList.contains('sel')) {
+        btn.classList.remove('sel');
+        addr.value = '';
+        contact.value = '';
+        checkSpecialAddr('', sansEl, shinsegaeEl);
+        setContactBtnsDisabled(contactBtns, false);
+        wp.short = null;
+      } else {
+        presetsEl.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('sel'));
+        btn.classList.add('sel');
+        addr.value = p.addr;
+        contact.value = p.contact;
+        checkSpecialAddr(p.addr, sansEl, shinsegaeEl);
+        setContactBtnsDisabled(contactBtns, AUTO_CONTACT_PRESETS.includes(p.name));
+        if (addr.value.trim()) addr.classList.remove('err-field');
+        if (contact.value.trim()) contact.classList.remove('err-field');
+        wp.short = p.short;
+      }
+    });
+    presetsEl.appendChild(btn);
+  });
+
+  // addr input listener
+  addr.addEventListener('input', e => {
+    checkSpecialAddr(e.target.value, sansEl, shinsegaeEl);
+    presetsEl.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('sel'));
+    setContactBtnsDisabled(contactBtns, false);
+    wp.short = null;
+    if (addr.value.trim()) addr.classList.remove('err-field');
+  });
+
+  // contact input listener (clear error on type)
+  contact.addEventListener('input', () => {
+    if (contact.value.trim()) contact.classList.remove('err-field');
+  });
+
+  // notice cards
+  WAYPOINT_NOTICES.forEach(n => {
+    const nc = document.createElement('div');
+    nc.className = 'notice-card';
+    nc.innerHTML = `<div class="ntitle">${n.title}</div><div class="nbody">${n.body}</div>`;
+    nc.addEventListener('click', () => {
+      if (wp.selectedNotices.has(n.id)) { wp.selectedNotices.delete(n.id); nc.classList.remove('sel'); }
+      else { wp.selectedNotices.add(n.id); nc.classList.add('sel'); }
+    });
+    noticeCardsEl.appendChild(nc);
+  });
+
+  // quick-time pills
+  quickEl.querySelectorAll('.pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      quickEl.querySelectorAll('.pill').forEach(b => b.classList.remove('sel','err-field'));
+      btn.classList.add('sel');
+      dtFieldsEl.style.display = btn.dataset.mode === 'pick' ? 'block' : 'none';
+      wp.mode = btn.dataset.mode === 'pick' ? null : btn.dataset.mode;
+    });
+  });
+
+  // remove button
+  removeBtn.addEventListener('click', () => {
+    if (!confirm('이 경유지를 삭제하시겠습니까? 입력한 정보가 사라집니다.')) return;
+    const idx = waypoints.findIndex(w => w.id === wp.id);
+    if (idx >= 0) waypoints.splice(idx, 1);
+    card.remove();
+    renumberWaypoints();
+  });
+
+  return card;
+}
+
+function renumberWaypoints() {
+  waypoints.forEach((wp, i) => {
+    const n = i + 1;
+    wp.refs.numBadge.textContent = n;
+    wp.refs.numText.textContent = n;
+  });
+}
+
+function addWaypoint() {
+  waypointCounter++;
+  const wp = {
+    id: 'w' + waypointCounter,
+    short: null,
+    selectedNotices: new Set(),
+    mode: null,
+  };
+  const card = buildWaypointCard(wp);
+  waypoints.push(wp);
+  document.getElementById('waypoints-area').appendChild(card);
+  renumberWaypoints();
+  // scroll into view so user sees the new card
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // focus first input
+  setTimeout(() => wp.refs.addr.focus({ preventScroll: true }), 350);
+}
+
+document.getElementById('add-waypoint-btn').addEventListener('click', addWaypoint);
+
 function se(id, show) { document.getElementById(id).style.display = show ? 'block' : 'none'; }
 
 function goTo(n) {
   document.querySelectorAll('.step').forEach((s, i) => s.classList.toggle('active', i === n));
-  for (let i = 0; i <= 2; i++) document.getElementById('d' + i).classList.toggle('done', i <= n);
+  for (let i = 0; i <= 3; i++) document.getElementById('d' + i).classList.toggle('done', i <= n);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -535,7 +1247,32 @@ function fmtTime(t) {
   return (hh < 12 ? '오전 ' : '오후 ') + (hh === 0 ? 12 : hh > 12 ? hh - 12 : hh) + (m !== '00' ? ':' + m : '시');
 }
 
+function addrShort(presetShort, addr) {
+  if (presetShort) return presetShort;
+  if (!addr) return '';
+  const parts = addr.trim().split(/\s+/).slice(0, 2);
+  const cleaned = parts.map(p => {
+    const r = p.replace(/(?<=.)(특별시|광역시|특별자치시|특별자치도|시|도|군|구)$/, '');
+    return r.length >= 2 ? r : p;
+  });
+  return cleaned.join('');
+}
+
+function validateWaypoint(wp) {
+  const addrVal = wp.refs.addr.value.trim();
+  const contactVal = wp.refs.contact.value.trim();
+  const dtPicked = wp.refs.dateEl.value && wp.refs.timeEl.value;
+  const dtOk = wp.mode === 'asap' || dtPicked;
+  const noAddr = !addrVal, noContact = !contactVal, noDt = !dtOk;
+  wp.refs.addr.classList.toggle('err-field', noAddr);
+  wp.refs.contact.classList.toggle('err-field', noContact);
+  if (noDt) wp.refs.quickEl.querySelectorAll('.pill').forEach(q => q.classList.add('err-field'));
+  else wp.refs.quickEl.querySelectorAll('.pill').forEach(q => q.classList.remove('err-field'));
+  return !(noAddr || noContact || noDt);
+}
+
 function generate() {
+  // 도착지 validation
   state.toAddr = document.getElementById('to-addr').value.trim();
   state.toContact = document.getElementById('to-contact').value.trim();
   state.toMemo = document.getElementById('to-memo').value.trim();
@@ -546,7 +1283,22 @@ function generate() {
   if (noDt) document.getElementById('to-quick').querySelectorAll('.pill').forEach(q => q.classList.add('err-field'));
   else document.getElementById('to-quick').querySelectorAll('.pill').forEach(q => q.classList.remove('err-field'));
   se('err2-addr', noAddr); se('err2-contact', noContact); se('err2-dt', noDt);
-  if (noAddr || noContact || noDt) return;
+
+  // 경유지 validation
+  let wpInvalid = false;
+  let firstInvalidWp = null;
+  waypoints.forEach(wp => {
+    if (!validateWaypoint(wp)) {
+      wpInvalid = true;
+      if (!firstInvalidWp) firstInvalidWp = wp;
+    }
+  });
+  se('err2-waypoint', wpInvalid);
+
+  if (noAddr || noContact || noDt || wpInvalid) {
+    if (firstInvalidWp) firstInvalidWp.refs.card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
 
   const fromDT = state.fromMode === 'immediate' ? '즉시 요청'
     : [fmtDate(document.getElementById('from-date').value), fmtTime(document.getElementById('from-time').value)].filter(Boolean).join(' ');
@@ -568,18 +1320,11 @@ function generate() {
     ...(toShinsegae ? ['  ' + SHINSEGAE_NOTICE] : [])
   ].join('\n');
 
-  function addrShort(presetShort, addr) {
-    if (presetShort) return presetShort;
-    const parts = addr.trim().split(/\s+/).slice(0, 2);
-    const cleaned = parts.map(p => {
-      const r = p.replace(/(?<=.)(특별시|광역시|특별자치시|특별자치도|시|도|군|구)$/, '');
-      return r.length >= 2 ? r : p;
-    });
-    return cleaned.join('');
-  }
   const fromShort = addrShort(state.fromShort, state.fromAddr);
   const toShort = addrShort(state.toShort, state.toAddr);
-  const summary = [fromShort, toShort].filter(Boolean).join('→');
+  const wpShorts = waypoints.map(wp => addrShort(wp.short, wp.refs.addr.value.trim()));
+  const summary = [fromShort, ...wpShorts, toShort].filter(Boolean).join('→');
+
   let msg = '🚚' + summary + '\n';
   msg += '─────────────────\n';
   msg += '📦 물품: ' + state.item + '\n';
@@ -592,6 +1337,30 @@ function generate() {
   msg += '  출발일시: ' + fromDT + '\n';
   if (fromNoticeLines) msg += '  특이사항:\n' + fromNoticeLines + '\n';
   if (state.fromMemo) msg += '  메모: ' + state.fromMemo + '\n';
+
+  // 경유지들
+  waypoints.forEach((wp, i) => {
+    const addrVal = wp.refs.addr.value.trim();
+    const contactVal = wp.refs.contact.value.trim();
+    const memoVal = wp.refs.memoEl.value.trim();
+    const wpDT = wp.mode === 'asap' ? '최대한 빠르게'
+      : [fmtDate(wp.refs.dateEl.value), fmtTime(wp.refs.timeEl.value)].filter(Boolean).join(' ');
+    const isSans = addrVal.includes(SANS_KEYWORD);
+    const isShinsegae = addrVal.includes(SHINSEGAE_KEYWORD);
+    const noticeLines = [
+      ...WAYPOINT_NOTICES.filter(n => wp.selectedNotices.has(n.id)).map(n => '  ⚠ ' + n.body),
+      ...(isSans ? ['  ' + SANS_NOTICE] : []),
+      ...(isShinsegae ? ['  ' + SHINSEGAE_NOTICE] : [])
+    ].join('\n');
+    msg += '─────────────────\n';
+    msg += '📍 경유지 ' + (i + 1) + '\n';
+    msg += '  주소: ' + addrVal + '\n';
+    msg += '  담당자: ' + contactVal + '\n';
+    msg += '  경유일시: ' + wpDT + '\n';
+    if (noticeLines) msg += '  특이사항:\n' + noticeLines + '\n';
+    if (memoVal) msg += '  메모: ' + memoVal + '\n';
+  });
+
   msg += '─────────────────\n';
   msg += '📍 도착지 (배송)\n';
   msg += '  주소: ' + state.toAddr + '\n';
@@ -602,13 +1371,112 @@ function generate() {
   msg += '─────────────────\n';
   msg += '💳 결제: ' + state.pay + '\n';
 
-  document.getElementById('result-text').textContent = msg.trim();
+  const finalMsg = msg.trim();
+  state.generatedText = finalMsg;
+  state.resultEditedText = null;
+  document.getElementById('result-text').textContent = finalMsg;
+  // reset edit UI
+  exitEditMode();
   goTo(3);
 }
 
+// ===== Edit mode =====
+function toggleEditMode() {
+  const ta = document.getElementById('result-textarea');
+  const isEditing = ta.style.display !== 'none';
+  if (isEditing) exitEditMode();
+  else enterEditMode();
+}
+
+function updateRevertBtnVisibility() {
+  const ta = document.getElementById('result-textarea');
+  const revertBtn = document.getElementById('revert-btn');
+  const isEditing = ta.style.display !== 'none';
+  const hasEdits = state.resultEditedText !== null;
+  // 편집 중이거나, 수정본이 있을 때 원복 버튼 노출
+  revertBtn.classList.toggle('visible', isEditing || hasEdits);
+}
+
+function enterEditMode() {
+  const pre = document.getElementById('result-text');
+  const ta = document.getElementById('result-textarea');
+  const btn = document.getElementById('edit-toggle');
+  const box = document.getElementById('result-box');
+  const hint = document.getElementById('editing-hint');
+  ta.value = state.resultEditedText !== null ? state.resultEditedText : pre.textContent;
+  pre.style.display = 'none';
+  ta.style.display = 'block';
+  ta.style.height = 'auto';
+  ta.style.height = Math.max(280, ta.scrollHeight) + 'px';
+  ta.oninput = () => {
+    ta.style.height = 'auto';
+    ta.style.height = Math.max(280, ta.scrollHeight) + 'px';
+    state.resultEditedText = ta.value;
+    document.getElementById('result-text').textContent = ta.value;
+    updateRevertBtnVisibility();
+  };
+  box.classList.add('editing');
+  hint.classList.add('visible');
+  btn.classList.add('editing');
+  btn.textContent = '✓ 수정 완료';
+  updateRevertBtnVisibility();
+  ta.focus();
+}
+
+function exitEditMode() {
+  const pre = document.getElementById('result-text');
+  const ta = document.getElementById('result-textarea');
+  const btn = document.getElementById('edit-toggle');
+  const box = document.getElementById('result-box');
+  const hint = document.getElementById('editing-hint');
+  if (ta.style.display !== 'none' && state.resultEditedText !== null) {
+    pre.textContent = state.resultEditedText;
+  }
+  pre.style.display = 'block';
+  ta.style.display = 'none';
+  box.classList.remove('editing');
+  hint.classList.remove('visible');
+  btn.classList.remove('editing');
+  btn.textContent = state.resultEditedText !== null ? '✎ 다시 수정' : '✎ 직접 수정';
+  updateRevertBtnVisibility();
+}
+
+function revertToOriginal() {
+  if (state.resultEditedText === null) return; // 변경사항 없음
+  if (!confirm('원본 메시지로 되돌리시겠습니까? 수정한 내용이 사라집니다.')) return;
+  const ta = document.getElementById('result-textarea');
+  const pre = document.getElementById('result-text');
+  state.resultEditedText = null;
+  pre.textContent = state.generatedText;
+  // 편집 중이었다면 textarea도 동기화
+  if (ta.style.display !== 'none') {
+    ta.value = state.generatedText;
+    ta.style.height = 'auto';
+    ta.style.height = Math.max(280, ta.scrollHeight) + 'px';
+  }
+  // 편집 모드 유지 상태일 때는 버튼 라벨만 갱신, 아니면 라벨도 "직접 수정"으로
+  const btn = document.getElementById('edit-toggle');
+  if (ta.style.display === 'none') {
+    btn.textContent = '✎ 직접 수정';
+  }
+  updateRevertBtnVisibility();
+}
+
+document.getElementById('edit-toggle').addEventListener('click', toggleEditMode);
+document.getElementById('revert-btn').addEventListener('click', revertToOriginal);
+
 function copyMsg() {
   const btn = document.getElementById('copy-btn');
-  navigator.clipboard.writeText(document.getElementById('result-text').textContent).then(() => {
+  const ta = document.getElementById('result-textarea');
+  let text;
+  if (ta.style.display !== 'none') {
+    text = ta.value;
+    state.resultEditedText = text;
+    document.getElementById('result-text').textContent = text;
+  } else {
+    text = document.getElementById('result-text').textContent;
+  }
+  navigator.clipboard.writeText(text).then(() => {
     btn.textContent = '✓ 복사 완료!';
     btn.classList.add('done');
     setTimeout(() => { btn.textContent = '복사하기'; btn.classList.remove('done'); }, 2000);
