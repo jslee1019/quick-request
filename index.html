@@ -572,7 +572,7 @@ h1 {
 <div class="wrap">
   <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:1.75rem;">
     <h1 style="margin-bottom:0;">🚚 퀵 배송 요청</h1>
-    <span style="font-size:10px; color:var(--gray-500); letter-spacing:0.08em; font-weight:600;">v2026.05.20</span>
+    <span style="font-size:10px; color:var(--gray-500); letter-spacing:0.08em; font-weight:600;">v2026.05.26</span>
   </div>
   <div class="progress">
     <div class="dot done" id="d0"></div>
@@ -589,7 +589,7 @@ h1 {
       <label>물품 내용<span class="req">*</span></label>
       <input type="text" id="item" placeholder="예) 말통 3통, 소박스 2박스">
     </div>
-    <div class="sec-divider">차량 종류</div>
+    <div class="sec-divider">차량 종류 <span style="text-transform:none;letter-spacing:0;color:var(--gray-500);font-weight:500;">· 복수 선택 가능</span></div>
     <div class="vehicle-grid" id="vehicle-grid">
       <div class="vcard" data-val="오토바이"><div class="vname">오토바이</div><div class="vdesc">초소형 / 퀵</div></div>
       <div class="vcard" data-val="다마스"><div class="vname">다마스</div><div class="vdesc">소형 / 도심</div></div>
@@ -988,11 +988,17 @@ buildNotices('to-notice-cards', TO_NOTICES, selectedToNotices);
 
 document.getElementById('vehicle-grid').querySelectorAll('.vcard').forEach(c => {
   c.addEventListener('click', () => {
-    document.getElementById('vehicle-grid').querySelectorAll('.vcard').forEach(x => x.classList.remove('sel','err-field'));
-    c.classList.add('sel');
-    state.vehicle = c.dataset.val;
-    document.getElementById('vehicle-other-wrap').style.display = c.dataset.val === '직접 입력' ? 'block' : 'none';
-    document.getElementById('temp-wrap').style.display = c.dataset.val.includes('냉장') ? 'block' : 'none';
+    // 선택 토글
+    c.classList.toggle('sel');
+    // 에러 표시 제거 (전체)
+    document.getElementById('vehicle-grid').querySelectorAll('.vcard').forEach(x => x.classList.remove('err-field'));
+    // 선택된 차량 목록 갱신
+    const selected = Array.from(document.getElementById('vehicle-grid').querySelectorAll('.vcard.sel')).map(x => x.dataset.val);
+    state.vehicles = selected;
+    // "직접 입력" 입력란 표시 여부
+    document.getElementById('vehicle-other-wrap').style.display = selected.includes('직접 입력') ? 'block' : 'none';
+    // 냉장/냉동 온도 입력란 표시 여부 (선택된 것 중 하나라도 '냉장' 포함 시)
+    document.getElementById('temp-wrap').style.display = selected.some(v => v.includes('냉장')) ? 'block' : 'none';
     document.getElementById('err0-vehicle').style.display = 'none';
   });
 });
@@ -1210,11 +1216,14 @@ function goTo(n) {
 function next(n) {
   if (n === 0) {
     state.item = document.getElementById('item').value.trim();
-    if (state.vehicle === '직접 입력') state.vehicle = document.getElementById('vehicle-other').value.trim();
+    state.vehicles = state.vehicles || [];
+    // "직접 입력" 선택 시 입력값으로 치환
+    const otherVal = document.getElementById('vehicle-other').value.trim();
+    state.vehicles = state.vehicles.map(v => v === '직접 입력' ? otherVal : v).filter(Boolean);
     state.temp = document.getElementById('temp').value.trim();
-    const noItem = !state.item, noVehicle = !state.vehicle;
+    const noItem = !state.item, noVehicle = state.vehicles.length === 0;
     document.getElementById('item').classList.toggle('err-field', noItem);
-    if (noVehicle) document.getElementById('vehicle-grid').querySelectorAll('.vcard:not(.sel)').forEach(v => v.classList.add('err-field'));
+    if (noVehicle) document.getElementById('vehicle-grid').querySelectorAll('.vcard').forEach(v => v.classList.add('err-field'));
     se('err0-item', noItem); se('err0-vehicle', noVehicle);
     if (noItem || noVehicle) return;
   }
@@ -1329,7 +1338,7 @@ function generate() {
   let msg = '🚚' + summary + '\n';
   msg += '─────────────────\n';
   msg += '📦 물품: ' + state.item + '\n';
-  msg += '  차량: ' + state.vehicle + '\n';
+  msg += '  차량: ' + (state.vehicles && state.vehicles.length ? state.vehicles.join(' / ') : '') + '\n';
   if (state.temp) msg += '  온도: ' + state.temp + '\n';
   msg += '─────────────────\n';
   msg += '📍 출발지 (픽업)\n';
