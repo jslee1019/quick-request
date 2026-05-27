@@ -572,7 +572,7 @@ h1 {
 <div class="wrap">
   <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:1.75rem;">
     <h1 style="margin-bottom:0;">🚚 퀵 배송 요청</h1>
-    <span style="font-size:10px; color:var(--gray-500); letter-spacing:0.08em; font-weight:600;">v2026.05.26</span>
+    <span style="font-size:10px; color:var(--gray-500); letter-spacing:0.08em; font-weight:600;">v2026.05.27</span>
   </div>
   <div class="progress">
     <div class="dot done" id="d0"></div>
@@ -645,18 +645,7 @@ h1 {
       </div>
     </div>
     <div class="sec-divider">출발지 특이사항</div>
-    <div id="from-auto-notice" style="display:none;">
-      <div class="auto-notice">
-        <div class="alabel">자동 감지 — 산스 (수표로28길 30)</div>
-        <div class="abody">오시는 길: 낙원상가에서 나오시다가 좌측에 익선동 노가리마켓 보이면 차 세우고, 부산오뎅과 노가리마켓 사이 골목으로 들어와주세요! 갈림길에서 우측으로 쭉 직진하셔서 벽면에 스테인리스 붙어있는 건물입니다.</div>
-      </div>
-    </div>
-    <div id="from-shinsegae-notice" style="display:none;">
-      <div class="auto-notice">
-        <div class="alabel">자동 감지 — 신세계 강남</div>
-        <div class="abody">매장 안쪽까지 이동 거리가 있습니다. 끌 차(핸드트럭) 필수 지참 부탁드리며, 물건을 끝까지 성실하게 운반해주실 기사님을 요청드립니다. </div>
-      </div>
-    </div>
+    <div id="from-auto-notices"></div>
     <div class="notice-cards" id="from-notice-cards"></div>
     <div class="field">
       <label>픽업 메모<span class="tag-opt">선택</span></label>
@@ -710,18 +699,7 @@ h1 {
       </div>
     </div>
     <div class="sec-divider">도착지 특이사항</div>
-    <div id="to-auto-notice" style="display:none;">
-      <div class="auto-notice">
-        <div class="alabel">자동 감지 — 산스 (수표로28길 30)</div>
-        <div class="abody">오시는 길: 낙원상가에서 나오시다가 좌측에 익선동 노가리마켓 보이면 차 세우고, 부산오뎅과 노가리마켓 사이 골목으로 들어와주세요! 갈림길에서 우측으로 쭉 직진하셔서 벽면에 스테인리스 붙어있는 건물입니다.</div>
-      </div>
-    </div>
-    <div id="to-shinsegae-notice" style="display:none;">
-      <div class="auto-notice">
-        <div class="alabel">자동 감지 — 신세계 강남</div>
-        <div class="abody">매장 안쪽까지 이동 거리가 있습니다. 끌 차(핸드트럭) 필수 지참 부탁드리며, 물건을 끝까지 성실하게 운반해주실 기사님을 요청드립니다. </div>
-      </div>
-    </div>
+    <div id="to-auto-notices"></div>
     <div class="notice-cards" id="to-notice-cards"></div>
     <div class="field">
       <label>추가 메모<span class="tag-opt">선택</span></label>
@@ -770,6 +748,15 @@ const SANS_KEYWORD = '수표로28길';
 const SANS_NOTICE = '오시는 길: 낙원상가에서 나오시다가 좌측에 익선동 노가리마켓 보이면 차 세우고, 부산오뎅과 노가리마켓 사이 골목으로 들어와주세요! 갈림길에서 우측으로 쭉 직진하셔서 벽면에 스테인리스 붙어있는 건물입니다.';
 const SHINSEGAE_KEYWORD = '신반포로 176';
 const SHINSEGAE_NOTICE = '매장 안쪽까지 이동 거리가 있습니다. 끌 차(핸드트럭) 필수 지참 부탁드리며, 물건을 끝까지 성실하게 운반해주실 기사님을 요청드립니다.';
+const SAMSUNG_KEYWORD = '삼성로 130';
+const SAMSUNG_NOTICE = '보안검색이 엄격합니다. 방문 사전 등록 필수, 입장 시 신분증 제출 후 출입 표찰 교환이 필요합니다. USB 등 저장매체는 반입 금지이니 차량에 두고 들어와 주세요. 삼성디지털시티 방문 경험 있는 기사님 선호합니다.';
+
+// 자동감지 노티스 목록 — 새로 추가하려면 이 배열에 항목만 추가하면 됩니다.
+const AUTO_NOTICES = [
+  { id: 'sans',      keyword: SANS_KEYWORD,      label: '산스 (수표로28길 30)', body: SANS_NOTICE },
+  { id: 'shinsegae', keyword: SHINSEGAE_KEYWORD, label: '신세계 강남',           body: SHINSEGAE_NOTICE },
+  { id: 'samsung',   keyword: SAMSUNG_KEYWORD,   label: '삼성디지털시티',         body: SAMSUNG_NOTICE },
+];
 const PRESETS = [
   { name: '모두먼트', short: '모두먼트', addr: '경기 이천시 마장면 프리미엄아울렛로 33-48 A동 2층 모두먼트', contact: '배준혁 010-5582-2921' },
   { name: '삼우에프앤지', short: '냉장창고', addr: '경기 김포시 고촌읍 아라육로57번길 15 삼우 에프앤지', contact: '출고 현장 관리자 031-996-5404' },
@@ -778,6 +765,7 @@ const PRESETS = [
   { name: '산스 익선', short: '익선점', addr: '서울 종로구 수표로28길 30 산스 sans', contact: '' },
   { name: '본사', short: '본사', addr: '서울 중구 청계천로 100 시그니처타워 서관 1040호', contact: '' },
   { name: '현대 압구정', short: '현압', addr: '서울 강남구 압구정로 165 현대백화점 압구정본점 지하 2층 검품장', contact: '' },
+  { name: '삼성디지털시티', short: '삼성수원', addr: '경기 수원시 영통구 삼성로 130 삼성 수원 디지털시티 남문 지하 1층 하역장 (높이2.3m)', contact: '' },
 ];
 const FROM_NOTICES = [
   { id: 'fn_carry', title: '출발지 주소까지 오셔서 직접 운반 필요', body: '출발지 주소까지 오셔서 직접 픽업하여 가져가셔야 합니다.' },
@@ -804,6 +792,8 @@ const CONTACTS = [
   { name: '이혜빈', tel: '010-3520-9405' },
   { name: '인나래', tel: '010-4107-0906' },
   { name: '정다솜', tel: '010-2317-7231' },
+  { name: '홍성훈', tel: '010-7123-0261' },
+  { name: '홍윤의', tel: '010-8765-2296' },
 ];
 const AUTO_CONTACT_PRESETS = ['모두먼트', '삼우에프앤지', '일산창고'];
 
@@ -840,11 +830,16 @@ function buildContactBtns(containerId, inputId) {
 buildContactBtns('from-contact-btns', 'from-contact');
 buildContactBtns('to-contact-btns', 'to-contact');
 
-function checkSpecialAddr(addr, sansAutoId, shinsegaeAutoId) {
-  const sansEl = typeof sansAutoId === 'string' ? document.getElementById(sansAutoId) : sansAutoId;
-  const shinEl = typeof shinsegaeAutoId === 'string' ? document.getElementById(shinsegaeAutoId) : shinsegaeAutoId;
-  if (sansEl) sansEl.style.display = addr.includes(SANS_KEYWORD) ? 'block' : 'none';
-  if (shinEl) shinEl.style.display = addr.includes(SHINSEGAE_KEYWORD) ? 'block' : 'none';
+function renderAutoNotices(containerElOrId, addr) {
+  const el = typeof containerElOrId === 'string' ? document.getElementById(containerElOrId) : containerElOrId;
+  if (!el) return;
+  const matched = AUTO_NOTICES.filter(n => addr && addr.includes(n.keyword));
+  el.innerHTML = matched.map(n => `
+    <div class="auto-notice">
+      <div class="alabel">자동 감지 — ${n.label}</div>
+      <div class="abody">${n.body}</div>
+    </div>
+  `).join('');
 }
 
 function buildTimeSelect(elOrId) {
@@ -885,13 +880,13 @@ setupQuickTime('from-quick', 'from-dt-fields', 'fromMode');
 setupQuickTime('to-quick', 'to-dt-fields', 'toMode');
 
 document.getElementById('from-addr').addEventListener('input', e => {
-  checkSpecialAddr(e.target.value, 'from-auto-notice', 'from-shinsegae-notice');
+  renderAutoNotices('from-auto-notices', e.target.value);
   document.getElementById('from-presets').querySelectorAll('.preset-btn').forEach(b => b.classList.remove('sel'));
   document.getElementById('from-contact-btns').querySelectorAll('.contact-btn').forEach(b => b.disabled = false);
   state.fromShort = null;
 });
 document.getElementById('to-addr').addEventListener('input', e => {
-  checkSpecialAddr(e.target.value, 'to-auto-notice', 'to-shinsegae-notice');
+  renderAutoNotices('to-auto-notices', e.target.value);
   document.getElementById('to-presets').querySelectorAll('.preset-btn').forEach(b => b.classList.remove('sel'));
   document.getElementById('to-contact-btns').querySelectorAll('.contact-btn').forEach(b => b.disabled = false);
   state.toShort = null;
@@ -940,14 +935,13 @@ function buildPresets(containerId, type) {
     btn.addEventListener('click', () => {
       const addrId = type === 'from' ? 'from-addr' : 'to-addr';
       const contactId = type === 'from' ? 'from-contact' : 'to-contact';
-      const autoId = type === 'from' ? 'from-auto-notice' : 'to-auto-notice';
-      const shinsegaeId = type === 'from' ? 'from-shinsegae-notice' : 'to-shinsegae-notice';
+      const autoNoticesId = type === 'from' ? 'from-auto-notices' : 'to-auto-notices';
       const contactBtnsId = type === 'from' ? 'from-contact-btns' : 'to-contact-btns';
       if (btn.classList.contains('sel')) {
         btn.classList.remove('sel');
         document.getElementById(addrId).value = '';
         document.getElementById(contactId).value = '';
-        checkSpecialAddr('', autoId, shinsegaeId);
+        renderAutoNotices(autoNoticesId, '');
         setContactBtnsDisabled(contactBtnsId, false);
         if (type === 'from') state.fromShort = null;
         else state.toShort = null;
@@ -956,7 +950,7 @@ function buildPresets(containerId, type) {
         btn.classList.add('sel');
         document.getElementById(addrId).value = p.addr;
         document.getElementById(contactId).value = p.contact;
-        checkSpecialAddr(p.addr, autoId, shinsegaeId);
+        renderAutoNotices(autoNoticesId, p.addr);
         setContactBtnsDisabled(contactBtnsId, AUTO_CONTACT_PRESETS.includes(p.name));
         clearInputError(document.getElementById(addrId));
         clearInputError(document.getElementById(contactId));
@@ -1045,18 +1039,7 @@ function buildWaypointCard(wp) {
       </div>
     </div>
     <div class="wp-sub-divider">경유지 특이사항</div>
-    <div data-role="sans-notice" style="display:none;">
-      <div class="auto-notice">
-        <div class="alabel">자동 감지 — 산스 (수표로28길 30)</div>
-        <div class="abody">${SANS_NOTICE}</div>
-      </div>
-    </div>
-    <div data-role="shinsegae-notice" style="display:none;">
-      <div class="auto-notice">
-        <div class="alabel">자동 감지 — 신세계 강남</div>
-        <div class="abody">${SHINSEGAE_NOTICE}</div>
-      </div>
-    </div>
+    <div data-role="auto-notices"></div>
     <div class="notice-cards" data-role="notice-cards"></div>
     <div class="field">
       <label>경유 메모<span class="tag-opt">선택</span></label>
@@ -1068,8 +1051,7 @@ function buildWaypointCard(wp) {
   const contact = card.querySelector('[data-role="contact"]');
   const contactBtns = card.querySelector('[data-role="contact-btns"]');
   const presetsEl = card.querySelector('[data-role="presets"]');
-  const sansEl = card.querySelector('[data-role="sans-notice"]');
-  const shinsegaeEl = card.querySelector('[data-role="shinsegae-notice"]');
+  const autoNoticesEl = card.querySelector('[data-role="auto-notices"]');
   const noticeCardsEl = card.querySelector('[data-role="notice-cards"]');
   const quickEl = card.querySelector('[data-role="quick"]');
   const dtFieldsEl = card.querySelector('[data-role="dt-fields"]');
@@ -1078,7 +1060,7 @@ function buildWaypointCard(wp) {
   const memoEl = card.querySelector('[data-role="memo"]');
   const removeBtn = card.querySelector('[data-action="remove"]');
 
-  wp.refs = { card, addr, contact, dateEl, timeEl, memoEl, quickEl, sansEl, shinsegaeEl, presetsEl, contactBtns, numBadge: card.querySelector('[data-role="num"]'), numText: card.querySelector('[data-role="num-text"]') };
+  wp.refs = { card, addr, contact, dateEl, timeEl, memoEl, quickEl, autoNoticesEl, presetsEl, contactBtns, numBadge: card.querySelector('[data-role="num"]'), numText: card.querySelector('[data-role="num-text"]') };
 
   // contact buttons
   CONTACTS.forEach(c => {
@@ -1112,7 +1094,7 @@ function buildWaypointCard(wp) {
         btn.classList.remove('sel');
         addr.value = '';
         contact.value = '';
-        checkSpecialAddr('', sansEl, shinsegaeEl);
+        renderAutoNotices(autoNoticesEl, '');
         setContactBtnsDisabled(contactBtns, false);
         wp.short = null;
       } else {
@@ -1120,7 +1102,7 @@ function buildWaypointCard(wp) {
         btn.classList.add('sel');
         addr.value = p.addr;
         contact.value = p.contact;
-        checkSpecialAddr(p.addr, sansEl, shinsegaeEl);
+        renderAutoNotices(autoNoticesEl, p.addr);
         setContactBtnsDisabled(contactBtns, AUTO_CONTACT_PRESETS.includes(p.name));
         if (addr.value.trim()) addr.classList.remove('err-field');
         if (contact.value.trim()) contact.classList.remove('err-field');
@@ -1132,7 +1114,7 @@ function buildWaypointCard(wp) {
 
   // addr input listener
   addr.addEventListener('input', e => {
-    checkSpecialAddr(e.target.value, sansEl, shinsegaeEl);
+    renderAutoNotices(autoNoticesEl, e.target.value);
     presetsEl.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('sel'));
     setContactBtnsDisabled(contactBtns, false);
     wp.short = null;
@@ -1316,19 +1298,15 @@ function generate() {
   const toDT = state.toMode === 'asap' ? '최대한 빠르게'
     : [fmtDate(document.getElementById('to-date').value), fmtTime(document.getElementById('to-time').value)].filter(Boolean).join(' ');
 
-  const fromSans = state.fromAddr && state.fromAddr.includes(SANS_KEYWORD);
-  const toSans = state.toAddr && state.toAddr.includes(SANS_KEYWORD);
-  const fromShinsegae = state.fromAddr && state.fromAddr.includes(SHINSEGAE_KEYWORD);
-  const toShinsegae = state.toAddr && state.toAddr.includes(SHINSEGAE_KEYWORD);
+  const autoMatchLines = (addr) =>
+    AUTO_NOTICES.filter(n => addr && addr.includes(n.keyword)).map(n => '  ' + n.body);
   const fromNoticeLines = [
     ...FROM_NOTICES.filter(n => selectedFromNotices.has(n.id)).map(n => '  ⚠ ' + n.body),
-    ...(fromSans ? ['  ' + SANS_NOTICE] : []),
-    ...(fromShinsegae ? ['  ' + SHINSEGAE_NOTICE] : [])
+    ...autoMatchLines(state.fromAddr)
   ].join('\n');
   const toNoticeLines = [
     ...TO_NOTICES.filter(n => selectedToNotices.has(n.id)).map(n => '  ⚠ ' + n.body),
-    ...(toSans ? ['  ' + SANS_NOTICE] : []),
-    ...(toShinsegae ? ['  ' + SHINSEGAE_NOTICE] : [])
+    ...autoMatchLines(state.toAddr)
   ].join('\n');
 
   const fromShort = addrShort(state.fromShort, state.fromAddr);
@@ -1356,12 +1334,9 @@ function generate() {
     const memoVal = wp.refs.memoEl.value.trim();
     const wpDT = wp.mode === 'asap' ? '최대한 빠르게'
       : [fmtDate(wp.refs.dateEl.value), fmtTime(wp.refs.timeEl.value)].filter(Boolean).join(' ');
-    const isSans = addrVal.includes(SANS_KEYWORD);
-    const isShinsegae = addrVal.includes(SHINSEGAE_KEYWORD);
     const noticeLines = [
       ...WAYPOINT_NOTICES.filter(n => wp.selectedNotices.has(n.id)).map(n => '  ⚠ ' + n.body),
-      ...(isSans ? ['  ' + SANS_NOTICE] : []),
-      ...(isShinsegae ? ['  ' + SHINSEGAE_NOTICE] : [])
+      ...autoMatchLines(addrVal)
     ].join('\n');
     msg += '─────────────────\n';
     msg += '📍 경유지 ' + (i + 1) + '\n';
