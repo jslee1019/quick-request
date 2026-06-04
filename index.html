@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>출장 유류비 산정</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<title>퀵 배송 요청</title>
 <style>
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
 
@@ -23,8 +22,7 @@
   --gray-900: #1A1A1A;
   --error-red: #E24B4A;
   --error-red-tint: #FDECEC;
-  --warning-amber: #B07A0E;
-  --warning-amber-tint: #FFF8E5;
+  --font-display: 'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
   --font-body: 'Pretendard', 'Inter', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
   --font-mono: 'SF Mono', 'Menlo', 'Consolas', 'D2Coding', monospace;
   --ease-quiet: cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -36,1489 +34,1440 @@ body {
   background: var(--gray-50);
   color: var(--sans-black);
   min-height: 100vh;
+  display: flex;
+  justify-content: center;
   padding: 2rem 1rem 4rem;
   -webkit-font-smoothing: antialiased;
-  font-size: 14px;
-  line-height: 1.6;
 }
-
-.wrap { width: 100%; max-width: 720px; margin: 0 auto; }
-
-.header-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; }
-.header-text h1 {
-  font-size: 15px; font-weight: 800; color: var(--sans-black);
-  margin-bottom: 8px; letter-spacing: 0.08em; text-transform: uppercase;
-}
-.header-text .subtitle { font-size: 11px; color: var(--gray-500); font-weight: 600; letter-spacing: 0.04em; }
-
-.version-info {
-  text-align: right;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  line-height: 1.7;
-}
-.version-info .ver-tag {
-  display: inline-block;
-  background: var(--sans-black);
-  color: var(--sans-mint);
-  padding: 3px 8px;
+.wrap {
+  width: 100%;
+  max-width: 540px;
+  background: var(--sans-white);
   border-radius: 4px;
+  padding: 2.5rem 1.75rem;
+  border: 1px solid var(--gray-200);
+}
+
+/* Header */
+h1 {
+  font-size: 15px;
   font-weight: 800;
+  color: var(--sans-black);
+  margin-bottom: 1.75rem;
   letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Progress */
+.progress { display: flex; gap: 4px; margin-bottom: 2rem; }
+.dot { height: 2px; flex: 1; background: var(--gray-200); transition: background 0.4s var(--ease-quiet); }
+.dot.done { background: var(--sans-black); }
+
+/* Steps */
+.step { display: none; }
+.step.active { display: block; }
+.step-label {
   font-size: 10px;
-}
-.version-info .ver-date {
   color: var(--gray-500);
+  margin-bottom: 6px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.step-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--sans-black);
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+/* Fields */
+.field { margin-bottom: 1.25rem; }
+.field label {
+  font-size: 11px;
+  color: var(--gray-700);
   display: block;
-  margin-top: 4px;
-}
-
-.section-card {
-  background: var(--sans-white); border: 1px solid var(--gray-200);
-  border-radius: 4px; padding: 1.5rem; margin-bottom: 1rem;
-}
-.section-title {
-  font-size: 11px; font-weight: 700; color: var(--gray-700);
-  margin-bottom: 1rem; letter-spacing: 0.12em; text-transform: uppercase;
-  display: flex; align-items: center; gap: 6px;
-}
-
-.field-label {
-  font-size: 11px; color: var(--gray-700); display: block;
-  margin-bottom: 6px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  margin-bottom: 6px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 .req { color: var(--error-red); margin-left: 2px; font-weight: 800; }
-input, select, button, textarea { font-family: inherit; font-size: 14px; }
-input[type="text"], input[type="number"], input[type="date"], select {
+.field input, .field select {
   width: 100%; padding: 12px 14px;
-  border: 1px solid var(--gray-200); border-radius: 4px;
-  background: var(--sans-white); color: var(--sans-black);
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  font-size: 14px;
+  background: var(--sans-white);
+  color: var(--sans-black);
+  font-family: inherit;
+  appearance: auto;
   transition: border-color 0.2s var(--ease-quiet), background 0.2s var(--ease-quiet);
 }
-input::placeholder { color: var(--gray-500); }
-input[readonly] { background: var(--gray-100); color: var(--gray-700); }
-input:focus, select:focus {
-  outline: none; border-color: var(--sans-black); background: var(--sans-white);
+.field input::placeholder { color: var(--gray-500); }
+.field input.err-field { border-color: var(--error-red); background: var(--error-red-tint); }
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none;
+  border-color: var(--sans-black);
+  background: var(--sans-white);
 }
-input.err-field, select.err-field { border-color: var(--error-red); background: var(--error-red-tint); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-button { cursor: pointer; transition: all 0.2s var(--ease-quiet); border-radius: 4px; font-weight: 600; }
-button:disabled { opacity: 0.4; cursor: not-allowed; }
-
-.btn {
-  width: 100%; padding: 14px; background: var(--sans-white);
-  border: 2px solid var(--sans-black); color: var(--sans-black);
-  font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
-}
-.btn:hover { background: var(--sans-black); color: var(--sans-mint); }
-.btn:active { transform: scale(0.99); }
-
-.btn-primary {
-  width: 100%; padding: 16px; background: var(--sans-black); color: var(--sans-mint);
-  border: none; font-size: 13px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
-}
-.btn-primary:hover { background: var(--gray-900); }
-
-.btn-add {
-  width: 100%; padding: 12px; background: var(--sans-white);
-  border: 1.5px dashed var(--gray-500); color: var(--gray-700);
-  font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-  border-radius: 4px; cursor: pointer; transition: all 0.2s var(--ease-quiet);
-}
-.btn-add:hover { border-color: var(--sans-black); color: var(--sans-black); background: var(--gray-50); }
-.btn-add:active { transform: scale(0.99); }
-
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-.mb-12 { margin-bottom: 12px; }
-.mb-8 { margin-bottom: 8px; }
-.mb-16 { margin-bottom: 16px; }
-
-.addr-input-wrap { display: grid; grid-template-columns: 1fr auto; gap: 6px; }
-.addr-search-btn {
-  padding: 0 18px; background: var(--sans-black); border: none; color: var(--sans-mint);
-  font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
-  white-space: nowrap; border-radius: 4px;
-}
-.addr-search-btn:hover { background: var(--gray-900); }
-.addr-search-btn:active { transform: scale(0.97); }
-
-.fixed-display {
-  background: var(--gray-100); padding: 12px 14px; border-radius: 4px;
-  font-size: 14px; color: var(--gray-700); border: 1px solid var(--gray-200);
+/* Section dividers */
+.sec-divider {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gray-500);
+  margin: 1.5rem 0 0.85rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--gray-200);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
-.info-banner {
-  background: var(--sans-mint-tint); padding: 12px 14px; border-radius: 4px;
-  border-left: 3px solid var(--sans-mint-deep); margin-bottom: 12px;
-  font-size: 12px; color: var(--gray-900);
-}
-.warning-banner {
-  background: var(--warning-amber-tint); padding: 12px 14px; border-radius: 4px;
-  border-left: 3px solid var(--warning-amber); margin-bottom: 12px;
-  font-size: 12px; color: var(--warning-amber); font-weight: 600;
-}
-.fallback-notice {
-  background: var(--warning-amber-tint); padding: 10px 12px; border-radius: 4px;
-  border-left: 3px solid var(--warning-amber); margin-top: 8px;
-  font-size: 11px; color: var(--warning-amber); font-weight: 600; line-height: 1.5;
-}
-
-.lock-icon { color: var(--gray-300); font-size: 11px; margin-left: 6px; }
-.spin { animation: spin 1s linear infinite; display: inline-block; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.radio-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.radio-card {
-  padding: 14px 14px; border-radius: 4px;
-  background: var(--gray-100); cursor: pointer;
-  transition: all 0.2s var(--ease-quiet);
+/* Vehicle grid */
+.vehicle-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 1.25rem; }
+.vcard {
+  padding: 12px 10px;
+  border-radius: 4px;
+  background: var(--gray-100);
+  cursor: pointer;
+  transition: background 0.2s var(--ease-quiet), color 0.2s var(--ease-quiet);
   border: 1px solid transparent;
-  display: flex; align-items: flex-start; gap: 10px;
 }
-.radio-card:hover { background: var(--gray-200); }
-.radio-card.selected { background: var(--sans-black); border-color: var(--sans-black); }
-.radio-card.err-field { background: var(--error-red-tint); border-color: var(--error-red); }
-.radio-circle {
-  width: 18px; height: 18px; border-radius: 50%;
-  border: 2px solid var(--gray-500); background: var(--sans-white);
-  flex-shrink: 0; margin-top: 1px; position: relative;
-  transition: all 0.2s var(--ease-quiet);
+.vcard:hover { background: var(--gray-200); }
+.vcard.sel {
+  background: var(--sans-black);
+  border-color: var(--sans-black);
 }
-.radio-card.selected .radio-circle { border-color: var(--sans-mint); background: transparent; }
-.radio-card.selected .radio-circle::after {
-  content: ''; position: absolute;
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--sans-mint);
-  top: 50%; left: 50%; transform: translate(-50%, -50%);
-}
-.radio-content { flex: 1; min-width: 0; }
-.radio-card-title {
-  font-size: 13px; font-weight: 700; color: var(--sans-black);
-  margin: 0 0 4px; letter-spacing: -0.01em;
-}
-.radio-card-desc {
-  font-size: 10px; color: var(--gray-500); margin: 0;
-  letter-spacing: 0.04em; text-transform: uppercase; font-weight: 500; line-height: 1.5;
-}
-.radio-card.selected .radio-card-title { color: var(--sans-mint); }
-.radio-card.selected .radio-card-desc { color: var(--sans-mint); opacity: 0.7; }
+.vcard.err-field { background: var(--error-red-tint); box-shadow: inset 0 0 0 1px var(--error-red); }
+.vcard .vname { font-size: 13px; font-weight: 700; color: var(--sans-black); letter-spacing: -0.01em; }
+.vcard .vdesc { font-size: 10px; color: var(--gray-500); margin-top: 3px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 500; }
+.vcard.sel .vname { color: var(--sans-mint); }
+.vcard.sel .vdesc { color: var(--sans-mint); opacity: 0.7; }
 
-.home-inline {
-  margin-top: 12px; padding: 14px;
+/* Preset list */
+.preset-grid { display: flex; flex-direction: column; gap: 4px; margin-bottom: 1.25rem; }
+.preset-btn {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: 4px;
+  background: var(--gray-100);
+  cursor: pointer;
+  transition: background 0.2s var(--ease-quiet), color 0.2s var(--ease-quiet);
+  text-align: left;
+  width: 100%;
+  border: none;
+}
+.preset-btn:hover { background: var(--gray-200); }
+.preset-btn.sel { background: var(--sans-black); }
+.preset-name { font-size: 13px; font-weight: 700; color: var(--sans-black); letter-spacing: -0.01em; }
+.preset-addr {
+  font-size: 11px;
+  color: var(--gray-500);
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 360px;
+}
+.preset-btn.sel .preset-name { color: var(--sans-mint); }
+.preset-btn.sel .preset-addr { color: var(--sans-mint); opacity: 0.7; }
+.preset-arrow { font-size: 13px; color: var(--gray-300); margin-left: 8px; flex-shrink: 0; }
+.preset-btn.sel .preset-arrow { color: var(--sans-mint); }
+
+/* Pills */
+.pill-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.pill {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--gray-300);
+  font-size: 12px;
+  cursor: pointer;
+  background: var(--sans-white);
+  color: var(--gray-700);
+  transition: all 0.2s var(--ease-quiet);
+  white-space: nowrap;
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.pill:hover { border-color: var(--sans-black); color: var(--sans-black); }
+.pill.sel {
+  background: var(--sans-black);
+  color: var(--sans-mint);
+  border-color: var(--sans-black);
+  font-weight: 700;
+}
+.pill.err-field { border-color: var(--error-red); background: var(--error-red-tint); color: var(--error-red); }
+
+.datetime-wrap { margin-bottom: 1.25rem; }
+.datetime-wrap > label {
+  font-size: 11px;
+  color: var(--gray-700);
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.dt-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* Notice cards */
+.notice-cards { display: flex; flex-direction: column; gap: 4px; margin-bottom: 1.25rem; }
+.notice-card {
+  padding: 12px 14px;
+  border-radius: 4px;
+  background: var(--gray-100);
+  cursor: pointer;
+  transition: background 0.2s var(--ease-quiet);
+  border: none;
+}
+.notice-card:hover { background: var(--gray-200); }
+.notice-card.sel { background: var(--sans-black); }
+.notice-card .ntitle { font-size: 12px; font-weight: 700; color: var(--sans-black); margin-bottom: 4px; letter-spacing: -0.005em; }
+.notice-card .nbody { font-size: 11px; color: var(--gray-500); line-height: 1.6; }
+.notice-card.sel .ntitle { color: var(--sans-mint); }
+.notice-card.sel .nbody { color: var(--sans-mint); opacity: 0.75; }
+
+/* Auto-notice (special address) */
+.auto-notice {
+  padding: 12px 14px;
+  border-radius: 4px;
   background: var(--sans-mint-tint);
   border-left: 3px solid var(--sans-mint-deep);
-  border-radius: 4px; display: none;
+  margin-bottom: 1.25rem;
 }
-.home-inline.show { display: block; }
-.home-inline-title {
-  font-size: 11px; font-weight: 700; color: var(--gray-900);
-  margin-bottom: 8px; letter-spacing: 0.08em; text-transform: uppercase;
-  display: flex; align-items: center; gap: 6px;
+.auto-notice .alabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
-.home-inline-note {
-  font-size: 11px; color: var(--gray-900); margin-top: 8px;
-  font-weight: 500; line-height: 1.5;
+.auto-notice .abody { font-size: 11px; color: var(--gray-900); line-height: 1.6; opacity: 0.85; }
+
+.section-bar { height: 1px; background: var(--gray-200); margin: 1.75rem 0; }
+.tag-opt {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--gray-100);
+  color: var(--gray-500);
+  display: inline-block;
+  margin-left: 6px;
+  vertical-align: middle;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.err-msg {
+  font-size: 11px;
+  color: var(--error-red);
+  margin-top: 6px;
+  display: none;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
-.visit-card { background: var(--gray-100); border-radius: 4px; padding: 14px; margin-bottom: 6px; }
-.visit-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.visit-card-title {
-  font-size: 11px; font-weight: 700; color: var(--sans-black);
-  margin: 0; letter-spacing: 0.08em; text-transform: uppercase;
+/* Buttons */
+.btn-row { display: flex; gap: 8px; }
+.btn {
+  flex: 1;
+  padding: 14px;
+  border-radius: 999px;
+  border: 1px solid var(--sans-black);
+  font-size: 13px;
+  cursor: pointer;
+  background: var(--sans-white);
+  color: var(--sans-black);
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: background 0.2s var(--ease-quiet), color 0.2s var(--ease-quiet);
 }
-.visit-card-actions { display: flex; gap: 4px; }
-.icon-btn {
-  width: 28px; height: 28px; padding: 0;
-  display: flex; align-items: center; justify-content: center;
-  background: var(--sans-white); border: none; color: var(--gray-700);
+.btn:hover { background: var(--gray-100); }
+.btn.primary {
+  background: var(--sans-black);
+  color: var(--sans-white);
+  border-color: var(--sans-black);
 }
-.icon-btn:hover { background: var(--sans-black); color: var(--sans-mint); }
-.icon-btn.btn-danger:hover { background: var(--error-red); color: var(--sans-white); }
+.btn.primary:hover {
+  background: var(--sans-mint);
+  color: var(--sans-black);
+  border-color: var(--sans-mint);
+}
 
-.receipt-upload {
-  border: 1px dashed var(--gray-300); border-radius: 4px; padding: 14px;
-  margin-top: 6px; text-align: center; cursor: pointer; background: var(--sans-white);
+/* Result box */
+.result-box {
+  background: var(--gray-100);
+  border-radius: 4px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 0.75rem;
+  transition: background 0.3s var(--ease-quiet), box-shadow 0.3s var(--ease-quiet);
+  border: 1px solid transparent;
+}
+.result-box.editing {
+  background: var(--sans-mint-tint);
+  border-color: var(--sans-mint-deep);
+  box-shadow: 0 0 0 4px rgba(192, 255, 238, 0.35);
+}
+.result-box pre {
+  font-family: inherit;
+  font-size: 13px;
+  white-space: pre-wrap;
+  line-height: 1.85;
+  color: var(--gray-900);
+}
+.result-box textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  resize: vertical;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.95;
+  color: var(--sans-black);
+  font-weight: 500;
+  min-height: 280px;
+  padding: 0;
+  outline: none;
+  caret-color: var(--sans-mint-deep);
+}
+.editing-hint {
+  display: none;
+  font-size: 10px;
+  color: var(--sans-black);
+  font-weight: 700;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  background: var(--sans-mint);
+  border-radius: 4px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.editing-hint.visible { display: block; }
+
+/* Edit toggle row */
+.edit-toggle-row { display: flex; justify-content: flex-end; align-items: center; gap: 6px; margin-bottom: 0.6rem; }
+.edit-toggle {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--gray-300);
+  font-size: 11px;
+  cursor: pointer;
+  background: var(--sans-white);
+  color: var(--gray-700);
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   transition: all 0.2s var(--ease-quiet);
 }
-.receipt-upload:hover { border-color: var(--sans-black); background: var(--gray-50); }
-.receipt-upload span {
-  font-size: 11px; color: var(--gray-700); font-weight: 600;
-  letter-spacing: 0.06em; text-transform: uppercase;
+.edit-toggle:hover { border-color: var(--sans-black); color: var(--sans-black); }
+.edit-toggle.editing {
+  background: var(--sans-black);
+  color: var(--sans-mint);
+  border-color: var(--sans-black);
+  font-weight: 700;
 }
-.receipt-preview { position: relative; margin-top: 6px; }
-.receipt-preview img {
-  max-width: 100%; max-height: 120px; border-radius: 4px;
-  border: 1px solid var(--gray-200); display: block; margin: 0 auto;
+.revert-btn {
+  display: none;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--gray-300);
+  font-size: 11px;
+  cursor: pointer;
+  background: var(--sans-white);
+  color: var(--gray-500);
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: all 0.2s var(--ease-quiet);
 }
-.receipt-remove {
-  position: absolute; top: 4px; right: 4px;
-  background: rgba(0,0,0,0.8); color: var(--sans-mint);
-  border: none; border-radius: 50%; width: 24px; height: 24px; padding: 0;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
+.revert-btn:hover { border-color: var(--sans-black); color: var(--sans-black); }
+.revert-btn.visible { display: inline-block; }
+
+/* Copy button */
+.copy-btn {
+  width: 100%;
+  padding: 15px;
+  border-radius: 999px;
+  border: 1px solid var(--sans-black);
+  background: var(--sans-black);
+  color: var(--sans-white);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: background 0.2s var(--ease-quiet), color 0.2s var(--ease-quiet);
+}
+.copy-btn:hover {
+  background: var(--sans-mint);
+  color: var(--sans-black);
+}
+.copy-btn.done {
+  background: var(--sans-mint);
+  color: var(--sans-black);
+  border-color: var(--sans-mint);
 }
 
-.route-summary-box {
-  background: var(--sans-mint-tint); padding: 14px; border-radius: 4px;
-  border-left: 3px solid var(--sans-mint-deep); margin-top: 12px;
+/* Result nav */
+.result-nav { display: flex; gap: 6px; margin-top: 12px; }
+.nav-btn {
+  flex: 1;
+  padding: 12px 6px;
+  border-radius: 4px;
+  background: var(--gray-100);
+  font-size: 10px;
+  cursor: pointer;
+  color: var(--gray-700);
+  font-family: inherit;
+  text-align: center;
+  line-height: 1.5;
+  transition: background 0.2s var(--ease-quiet), color 0.2s var(--ease-quiet);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: none;
 }
-.route-summary-title {
-  font-size: 10px; font-weight: 700; color: var(--gray-900);
-  margin-bottom: 8px; letter-spacing: 0.12em; text-transform: uppercase;
+.nav-btn:hover { background: var(--sans-black); color: var(--sans-mint); }
+
+/* Contact buttons */
+.contact-btns { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+.contact-btn {
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--gray-300);
+  font-size: 11px;
+  cursor: pointer;
+  background: var(--sans-white);
+  color: var(--gray-700);
+  font-family: inherit;
+  transition: all 0.2s var(--ease-quiet);
+  white-space: nowrap;
+  font-weight: 500;
 }
-.route-summary-line { font-size: 12px; color: var(--gray-900); margin-bottom: 4px; line-height: 1.5; }
-.route-summary-total {
-  margin-top: 10px; padding-top: 8px;
-  border-top: 1px solid rgba(0,0,0,0.1);
-  font-size: 12px; font-weight: 700; color: var(--sans-black);
+.contact-btn:hover { border-color: var(--sans-black); color: var(--sans-black); }
+.contact-btn.sel {
+  background: var(--sans-black);
+  color: var(--sans-mint);
+  border-color: var(--sans-black);
+  font-weight: 700;
+}
+.contact-btn:disabled { opacity: 0.25; cursor: not-allowed; pointer-events: none; }
+
+/* Waypoint card */
+.waypoint-card {
+  background: var(--gray-100);
+  border-radius: 4px;
+  padding: 1.25rem 1.25rem 0.5rem;
+  margin-bottom: 0.85rem;
+  position: relative;
+}
+.waypoint-card .wp-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.waypoint-card .wp-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--sans-black);
+  display: flex; align-items: center; gap: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.waypoint-card .wp-num-badge {
+  background: var(--sans-black);
+  color: var(--sans-mint);
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+}
+.wp-remove-btn {
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--gray-300);
+  background: var(--sans-white);
+  color: var(--gray-700);
+  font-size: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s var(--ease-quiet);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.wp-remove-btn:hover {
+  background: var(--sans-black);
+  color: var(--sans-white);
+  border-color: var(--sans-black);
+}
+.waypoint-card .wp-sub-divider {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gray-500);
+  margin: 1rem 0 0.6rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--gray-200);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.waypoint-card .wp-sub-divider:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+.waypoint-card .preset-grid { margin-bottom: 0.85rem; }
+.waypoint-card .preset-addr { max-width: 280px; }
+.waypoint-card .preset-btn { background: var(--sans-white); }
+.waypoint-card .preset-btn:hover { background: var(--gray-200); }
+.waypoint-card .notice-card { background: var(--sans-white); }
+.waypoint-card .notice-card:hover { background: var(--gray-200); }
+.waypoint-card .field input, .waypoint-card .field select { background: var(--sans-white); }
+
+/* Add waypoint button */
+.add-waypoint-btn {
+  width: 100%;
+  padding: 13px;
+  border-radius: 999px;
+  border: 1px dashed var(--sans-black);
+  background: var(--sans-white);
+  color: var(--sans-black);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s var(--ease-quiet), color 0.2s var(--ease-quiet);
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.add-waypoint-btn:hover {
+  background: var(--sans-mint);
+  border-style: solid;
 }
 
-.capture-area {
-  background: var(--sans-white); color: var(--sans-black);
-  border: 1px solid var(--gray-300); border-radius: 4px;
-  padding: 2rem 1.75rem;
+/* Destination heading */
+.dest-section-heading {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--sans-black);
+  margin: 0.5rem 0 1rem;
+  display: flex; align-items: center; gap: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
-.capture-header { border-bottom: 3px solid var(--sans-black); padding-bottom: 14px; margin-bottom: 1.5rem; }
-.capture-header-title { font-size: 18px; font-weight: 800; margin: 0; letter-spacing: -0.01em; }
-.capture-header-date { font-size: 11px; color: var(--gray-500); margin: 6px 0 0; font-weight: 600; letter-spacing: 0.04em; }
-.capture-section { margin-bottom: 1.5rem; }
-.capture-section-title {
-  font-size: 10px; font-weight: 700; color: var(--gray-700);
-  margin: 0 0 8px; letter-spacing: 0.12em; text-transform: uppercase;
-}
-.capture-table { width: 100%; font-size: 13px; border-collapse: collapse; }
-.capture-table td { padding: 5px 0; }
-.capture-table td.label {
-  color: var(--gray-700); width: 30%; font-size: 11px;
-  font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
-}
-.capture-calc {
-  background: var(--gray-100); border-radius: 4px; padding: 12px 14px;
-  font-size: 12px; font-family: var(--font-mono); line-height: 1.9; color: var(--gray-900);
-}
-.capture-route-table { width: 100%; font-size: 12px; border-collapse: collapse; }
-.capture-route-table th, .capture-route-table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--gray-200); }
-.capture-route-table th {
-  background: var(--gray-100); font-weight: 700; color: var(--gray-700);
-  font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
-}
-.capture-route-table td.km { text-align: right; font-family: var(--font-mono); color: var(--sans-black); }
-.capture-route-table tfoot tr td {
-  background: var(--gray-50); font-weight: 700; border-bottom: none;
-  border-top: 2px solid var(--sans-black);
-}
-.capture-total-sum {
-  font-family: var(--font-mono); font-size: 11px;
-  color: var(--gray-700); margin-top: 6px;
-}
-.capture-total-table { width: 100%; font-size: 13px; border-collapse: collapse; }
-.capture-total-table tr td { padding: 8px 0; border-bottom: 1px solid var(--gray-200); }
-.capture-total-table tr.total td {
-  background: var(--sans-black); color: var(--sans-mint);
-  font-weight: 800; padding: 12px; border-bottom: none;
-  font-size: 14px; letter-spacing: 0.04em;
-}
-.capture-receipts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.capture-receipts img {
-  max-width: 100%; max-height: 250px;
-  border: 1px solid var(--gray-300); border-radius: 4px;
-  display: block; margin: 6px auto 0; object-fit: contain;
-}
-.capture-receipt-label {
-  font-size: 10px; color: var(--gray-700); font-weight: 700;
-  text-align: center; margin: 0; letter-spacing: 0.08em; text-transform: uppercase;
-}
-.receipt-attached-mark {
-  color: var(--sans-mint-deep); font-size: 10px; font-weight: 700;
-  letter-spacing: 0.06em; text-transform: uppercase; margin-left: 4px;
-}
-.capture-basis {
-  background: var(--sans-mint-tint); border-left: 3px solid var(--sans-mint-deep);
-  padding: 12px 14px; font-size: 11px; color: var(--gray-900);
-  margin-top: 10px; border-radius: 4px; line-height: 1.7;
-}
-.capture-basis strong {
-  font-weight: 700; letter-spacing: 0.04em; display: block;
-  margin-bottom: 4px; font-size: 10px; text-transform: uppercase;
-}
-.capture-rules {
-  background: var(--warning-amber-tint); border: 1px solid #F0D589;
-  border-radius: 4px; padding: 14px 16px; margin-bottom: 1.5rem;
-}
-.capture-rules-title {
-  font-weight: 700; margin: 0 0 8px; font-size: 10px;
-  color: var(--warning-amber); letter-spacing: 0.12em; text-transform: uppercase;
-  display: flex; align-items: center; gap: 6px;
-}
-.capture-rules ol { margin: 0; padding-left: 20px; line-height: 1.8; color: var(--gray-900); font-size: 11px; }
-.capture-rules ol li { margin-bottom: 2px; }
-
-#fuel-info { font-size: 11px; color: var(--gray-700); margin-top: 10px; letter-spacing: 0.02em; font-weight: 500; line-height: 1.7; }
-#fuel-info .fuel-info-line { display: block; }
-#fuel-info .fuel-info-source { color: var(--gray-500); font-size: 10px; }
-#distance-source { font-size: 11px; color: var(--gray-500); margin-top: 10px; text-align: center; font-weight: 600; letter-spacing: 0.04em; }
-
-a { color: var(--sans-black); text-decoration: underline; }
-a:hover { color: var(--sans-mint-deep); }
-
-@media print {
-  @page { size: A4; margin: 12mm; }
-  body { background: white !important; padding: 0 !important; margin: 0 !important; }
-  .no-print { display: none !important; }
-  .wrap { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
-  .capture-area { border: none !important; padding: 0 !important; box-shadow: none !important; }
-  .capture-section { page-break-inside: avoid; }
-  .capture-rules { page-break-inside: avoid; }
-  .capture-route-table tr { page-break-inside: avoid; }
-  .capture-total-table { page-break-inside: avoid; }
-  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-}
-@media (max-width: 600px) {
-  .grid-3 { grid-template-columns: 1fr 1fr; }
-  .capture-receipts { grid-template-columns: 1fr; }
-  .radio-group { grid-template-columns: 1fr; }
+.dest-section-heading::before {
+  content: '📍'; font-size: 14px;
 }
 </style>
 </head>
 <body>
-
 <div class="wrap">
+  <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:1.75rem;">
+    <h1 style="margin-bottom:0;">🚚 퀵 배송 요청</h1>
+    <span style="font-size:10px; color:var(--gray-500); letter-spacing:0.08em; font-weight:600;">v2026.05.27</span>
+  </div>
+  <div class="progress">
+    <div class="dot done" id="d0"></div>
+    <div class="dot" id="d1"></div>
+    <div class="dot" id="d2"></div>
+    <div class="dot" id="d3"></div>
+  </div>
 
-  <div class="header-bar no-print">
-    <div class="header-text">
-      <h1>출장 유류비 산정</h1>
-      <p class="subtitle">결과 화면 → PDF/이미지 저장 → Flex 첨부</p>
+  <!-- Step 0: 물품 + 차량 -->
+  <div class="step active" id="s0">
+    <div class="step-label">1단계</div>
+    <div class="step-title">물품 정보 & 차량 선택</div>
+    <div class="field">
+      <label>물품 내용<span class="req">*</span></label>
+      <input type="text" id="item" placeholder="예) 말통 3통, 소박스 2박스">
     </div>
-    <div class="version-info">
-      <span class="ver-tag" id="ver-tag">v1.0</span>
-      <span class="ver-date" id="ver-date">2026-05-21</span>
+    <div class="sec-divider">차량 종류 <span style="text-transform:none;letter-spacing:0;color:var(--gray-500);font-weight:500;">· 복수 선택 가능</span></div>
+    <div class="vehicle-grid" id="vehicle-grid">
+      <div class="vcard" data-val="오토바이"><div class="vname">오토바이</div><div class="vdesc">초소형 / 퀵</div></div>
+      <div class="vcard" data-val="다마스"><div class="vname">다마스</div><div class="vdesc">소형 / 도심</div></div>
+      <div class="vcard" data-val="라보"><div class="vname">라보</div><div class="vdesc">소형 / 개방형</div></div>
+      <div class="vcard" data-val="1톤 탑차/윙바디"><div class="vname">1톤 탑차/윙바디</div><div class="vdesc">밀폐형</div></div>
+      <div class="vcard" data-val="1톤 오픈형"><div class="vname">1톤 오픈형</div><div class="vdesc">개방형 화물</div></div>
+      <div class="vcard" data-val="1톤 냉장/냉동"><div class="vname">1톤 냉장/냉동</div><div class="vdesc">저온 식품</div></div>
+      <div class="vcard" data-val="2.5톤"><div class="vname">2.5톤</div><div class="vdesc">중형 화물</div></div>
+      <div class="vcard" data-val="5톤"><div class="vname">5톤</div><div class="vdesc">대형 화물</div></div>
+      <div class="vcard" data-val="직접 입력"><div class="vname">기타</div><div class="vdesc">직접 입력</div></div>
+    </div>
+    <div class="field" id="vehicle-other-wrap" style="display:none;">
+      <label>차량 직접 입력</label>
+      <input type="text" id="vehicle-other" placeholder="차량 종류를 입력하세요">
+    </div>
+    <div class="field" id="temp-wrap" style="display:none;">
+      <label>냉장/냉동 온도<span class="tag-opt">선택</span></label>
+      <input type="text" id="temp" placeholder="예) -18℃ 이하, 0~5℃">
+    </div>
+    <div class="err-msg" id="err0-item">물품 내용을 입력해주세요.</div>
+    <div class="err-msg" id="err0-vehicle">차량을 선택해주세요.</div>
+    <div class="btn-row" style="margin-top:1.5rem;">
+      <button class="btn primary" onclick="next(0)">다음</button>
     </div>
   </div>
 
-  <div id="step-input">
-
-  <div class="section-card no-print">
-    <p class="section-title"><i class="ti ti-user"></i> 기본 정보</p>
-    <div class="grid-2 mb-12">
-      <div><label class="field-label">신청자명<span class="req">*</span></label><input type="text" id="applicant" placeholder="홍길동"></div>
-      <div><label class="field-label">소속/직급<span class="req">*</span></label><input type="text" id="department" placeholder="영업팀 / 과장"></div>
+  <!-- Step 1: 출발지 -->
+  <div class="step" id="s1">
+    <div class="step-label">2단계</div>
+    <div class="step-title">출발지 (픽업)</div>
+    <div class="sec-divider" style="margin-top:0; border-top:none; padding-top:0;">자주 쓰는 주소</div>
+    <div class="preset-grid" id="from-presets"></div>
+    <div class="field">
+      <label>픽업 주소<span class="req">*</span></label>
+      <input type="text" id="from-addr" placeholder="주소를 직접 입력하거나 위에서 선택하세요">
     </div>
-    <div class="grid-2">
-      <div><label class="field-label">출장일자<span class="req">*</span></label><input type="date" id="trip-date"></div>
-      <div><label class="field-label">출장 목적<span class="req">*</span></label><input type="text" id="purpose" placeholder="OO 거래처 미팅"></div>
+    <div class="field">
+      <label>담당자 / 연락처<span class="req">*</span></label>
+      <input type="text" id="from-contact" placeholder="예) 홍길동 010-0000-0000">
+      <div class="contact-btns" id="from-contact-btns" style="margin-top:8px; margin-bottom:0;"></div>
     </div>
-  </div>
-
-  <div class="section-card no-print">
-    <p class="section-title"><i class="ti ti-car"></i> 차량 정보</p>
-    <div class="grid-2">
-      <div>
-        <label class="field-label">연료 종류<span class="req">*</span></label>
-        <select id="fuel-type">
-          <option value="gasoline" selected>휘발유</option>
-          <option value="premiumGasoline">고급휘발유</option>
-          <option value="diesel">경유</option>
-          <option value="lpg">LPG</option>
-          <option value="hybrid">하이브리드</option>
-        </select>
+    <div class="datetime-wrap">
+      <label>픽업 일시<span class="req" style="color:var(--error-red);">*</span></label>
+      <div class="pill-group" id="from-quick">
+        <div class="pill" data-mode="immediate">즉시 요청</div>
+        <div class="pill" data-mode="pick">날짜/시간 선택</div>
       </div>
-      <div><label class="field-label">차량번호<span class="req">*</span></label><input type="text" id="carnum" placeholder="12가 3456"></div>
-    </div>
-    <div id="fuel-info"></div>
-    <div id="fuel-fallback-notice" class="fallback-notice" style="display: none;"></div>
-  </div>
-
-  <div class="section-card no-print">
-    <p class="section-title"><i class="ti ti-sunrise"></i> 출장지 방문 형태</p>
-    <div class="radio-group">
-      <div class="radio-card selected" data-value="via-office" onclick="selectDepart('via-office')">
-        <div class="radio-circle"></div>
-        <div class="radio-content">
-          <p class="radio-card-title">회사 출근 후 출장지로</p>
-          <p class="radio-card-desc">집→회사→출장지<br>회사~출장지 거리 인정</p>
-        </div>
-      </div>
-      <div class="radio-card" data-value="direct" onclick="selectDepart('direct')">
-        <div class="radio-circle"></div>
-        <div class="radio-content">
-          <p class="radio-card-title">직출</p>
-          <p class="radio-card-desc">집→출장지 직행<br>집/회사 출발 중 짧은 거리</p>
-        </div>
-      </div>
-    </div>
-    <div class="home-inline" id="home-inline-depart">
-      <p class="home-inline-title"><i class="ti ti-home" style="font-size:11px;"></i> 자택 주소 입력</p>
-      <div class="addr-input-wrap mb-8">
-        <input type="text" id="home-addr" placeholder="주소 찾기 버튼 클릭" readonly>
-        <button class="addr-search-btn" onclick="searchAddr('home-addr')"><i class="ti ti-search"></i> 주소 찾기</button>
-      </div>
-      <input type="text" id="home-addr-detail" placeholder="상세주소 (선택, 예: 101동 502호)">
-      <p class="home-inline-note" id="home-inline-note-depart" style="display:none;">※ 직퇴에서도 위 자택 주소가 사용됩니다.</p>
-    </div>
-  </div>
-
-  <div class="section-card no-print">
-    <p class="section-title"><i class="ti ti-building"></i> 출발/도착 기준 지점<span class="req">*</span></p>
-    <p style="font-size: 11px; color: var(--gray-500); margin: 0 0 12px; letter-spacing: 0.04em;">출근/퇴근 시 기준이 되는 지점을 선택하세요. (소속 사업장)</p>
-    <select id="office-select"></select>
-    <div class="fixed-display" id="office-addr-display" style="margin-top: 10px;"></div>
-  </div>
-
-  <div class="section-card no-print">
-    <p class="section-title"><i class="ti ti-map-pin"></i> 출장지 (방문 순서대로)<span class="req">*</span></p>
-    <p style="font-size: 11px; color: var(--gray-500); margin: 0 0 14px; letter-spacing: 0.04em;">하루 동안 방문할 모든 출장지를 순서대로 입력하세요.</p>
-    <div id="visits-container"></div>
-    <button id="add-visit-btn" class="btn-add" style="margin-top: 8px;"><i class="ti ti-plus"></i> 출장지 추가</button>
-  </div>
-
-  <div class="section-card no-print">
-    <p class="section-title"><i class="ti ti-sunset"></i> 퇴근 형태</p>
-    <div class="radio-group">
-      <div class="radio-card selected" data-value="via-office" onclick="selectReturn('via-office')">
-        <div class="radio-circle"></div>
-        <div class="radio-content">
-          <p class="radio-card-title">회사 복귀 후 퇴근</p>
-          <p class="radio-card-desc">마지막 출장지→회사→집<br>마지막~회사 거리 인정</p>
-        </div>
-      </div>
-      <div class="radio-card" data-value="direct" onclick="selectReturn('direct')">
-        <div class="radio-circle"></div>
-        <div class="radio-content">
-          <p class="radio-card-title">직퇴</p>
-          <p class="radio-card-desc">마지막 출장지→집 직행<br>집/회사 도착 중 짧은 거리</p>
+      <div id="from-dt-fields" style="display:none;">
+        <div class="dt-row">
+          <div class="field" style="margin-bottom:0;"><input type="date" id="from-date"></div>
+          <div class="field" style="margin-bottom:0;"><select id="from-time"></select></div>
         </div>
       </div>
     </div>
-    <div class="home-inline" id="home-inline-return">
-      <p class="home-inline-title"><i class="ti ti-home" style="font-size:11px;"></i> 자택 주소 입력</p>
-      <div class="addr-input-wrap mb-8">
-        <input type="text" id="home-addr-2" placeholder="주소 찾기 버튼 클릭" readonly>
-        <button class="addr-search-btn" onclick="searchAddr('home-addr-2')"><i class="ti ti-search"></i> 주소 찾기</button>
-      </div>
-      <input type="text" id="home-addr-2-detail" placeholder="상세주소 (선택, 예: 101동 502호)">
+    <div class="sec-divider">출발지 특이사항</div>
+    <div id="from-auto-notices"></div>
+    <div class="notice-cards" id="from-notice-cards"></div>
+    <div class="field">
+      <label>픽업 메모<span class="tag-opt">선택</span></label>
+      <input type="text" id="from-memo" placeholder="예) 1층 물류창고 앞, 사전 연락 필요">
     </div>
-    <div class="home-inline" id="home-inline-share">
-      <p class="home-inline-title"><i class="ti ti-info-circle" style="font-size:11px;"></i> 자택 주소 자동 적용</p>
-      <p style="font-size: 12px; color: var(--gray-900); margin: 0;">위 "출장지 방문 형태"에서 입력한 자택 주소가 직퇴에도 동일하게 적용됩니다.</p>
-    </div>
-  </div>
-
-  <div class="section-card no-print">
-    <button id="auto-calc-btn" class="btn"><i class="ti ti-map-search"></i> 모든 거리 자동 조회</button>
-    <p id="distance-source"></p>
-    <div id="route-summary" style="display: none;"></div>
-  </div>
-
-  <div class="section-card no-print">
-    <p class="section-title"><i class="ti ti-receipt"></i> 부대비용 & 영수증</p>
-    <p style="font-size: 11px; color: var(--gray-500); margin: 0 0 14px; letter-spacing: 0.04em;">금액 입력 후 영수증 이미지를 첨부하면 결과 화면에 같이 표시됩니다. (선택)</p>
-    <div class="grid-2">
-      <div>
-        <label class="field-label">통행료 (원)</label>
-        <input type="number" id="toll" min="0" step="100" value="0">
-        <div class="receipt-upload" id="toll-upload-btn" onclick="document.getElementById('toll-receipt').click()">
-          <input type="file" id="toll-receipt" accept="image/*" style="display: none;">
-          <span><i class="ti ti-photo-plus"></i> 영수증 첨부</span>
-        </div>
-        <div id="toll-receipt-preview" class="receipt-preview" style="display: none;">
-          <img id="toll-receipt-img">
-          <button class="receipt-remove" onclick="removeReceipt('toll')"><i class="ti ti-x" style="font-size:12px;"></i></button>
-        </div>
-      </div>
-      <div>
-        <label class="field-label">주차비 (원)</label>
-        <input type="number" id="parking" min="0" step="100" value="0">
-        <div class="receipt-upload" id="parking-upload-btn" onclick="document.getElementById('parking-receipt').click()">
-          <input type="file" id="parking-receipt" accept="image/*" style="display: none;">
-          <span><i class="ti ti-photo-plus"></i> 영수증 첨부</span>
-        </div>
-        <div id="parking-receipt-preview" class="receipt-preview" style="display: none;">
-          <img id="parking-receipt-img">
-          <button class="receipt-remove" onclick="removeReceipt('parking')"><i class="ti ti-x" style="font-size:12px;"></i></button>
-        </div>
-      </div>
+    <div class="err-msg" id="err1-addr">픽업 주소를 입력해주세요.</div>
+    <div class="err-msg" id="err1-contact">담당자/연락처를 입력해주세요.</div>
+    <div class="err-msg" id="err1-dt">픽업 일시를 선택해주세요.</div>
+    <div class="btn-row" style="margin-top:1.5rem;">
+      <button class="btn" onclick="goTo(0)">이전</button>
+      <button class="btn primary" onclick="next(1)">다음</button>
     </div>
   </div>
 
-  <div class="warning-banner no-print" id="validation-error" style="display: none;">
-    <i class="ti ti-alert-triangle"></i> <span id="validation-error-msg"></span>
-  </div>
+  <!-- Step 2: 경유지(선택) + 도착지 -->
+  <div class="step" id="s2">
+    <div class="step-label">3단계</div>
+    <div class="step-title">경유지 & 도착지</div>
 
-  <button id="calc-btn" class="btn-primary no-print" style="margin-bottom: 16px;"><i class="ti ti-file-text"></i> 기안 만들기</button>
+    <!-- Waypoints inline area -->
+    <div id="waypoints-area"></div>
 
-  </div><!-- /step-input -->
+    <!-- Add waypoint button (sits right above 도착지) -->
+    <button class="add-waypoint-btn" id="add-waypoint-btn">+ 경유지 추가</button>
 
-  <div id="result-wrap" style="display: none;">
-    <div class="info-banner no-print" id="result-info-banner"><i class="ti ti-circle-check"></i> <span id="result-info-text">산정서가 생성되었습니다.</span></div>
+    <!-- 도착지 heading -->
+    <div class="dest-section-heading">도착지 (배송)</div>
 
-    <div id="capture-area" class="capture-area">
-      <div class="capture-header">
-        <p class="capture-header-title">출장 유류비 산정서</p>
-        <p class="capture-header-date" id="capture-date"></p>
+    <div class="sec-divider" style="margin-top:0; border-top:none; padding-top:0;">자주 쓰는 주소</div>
+    <div class="preset-grid" id="to-presets"></div>
+    <div class="field">
+      <label>배송 주소<span class="req">*</span></label>
+      <input type="text" id="to-addr" placeholder="주소를 직접 입력하거나 위에서 선택하세요">
+    </div>
+    <div class="field">
+      <label>수령인 / 연락처<span class="req">*</span></label>
+      <input type="text" id="to-contact" placeholder="예) 이대리 010-1234-5678">
+      <div class="contact-btns" id="to-contact-btns" style="margin-top:8px; margin-bottom:0;"></div>
+    </div>
+    <div class="datetime-wrap">
+      <label>도착 희망 일시<span class="req" style="color:var(--error-red);">*</span></label>
+      <div class="pill-group" id="to-quick">
+        <div class="pill" data-mode="asap">최대한 빠르게</div>
+        <div class="pill" data-mode="pick">날짜/시간 선택</div>
       </div>
-
-      <div class="capture-rules">
-        <p class="capture-rules-title"><i class="ti ti-clipboard-text" style="font-size:11px;"></i> 출장 유류비 산정 사규 요약</p>
-        <ol>
-          <li>통근거리(자택~회사)는 출장거리에서 제외함</li>
-          <li>직출/직퇴 시: 자택 기준 경로와 회사 기준 경로 중 <strong>짧은 거리</strong>를 인정함</li>
-          <li>표준 연비: 인사혁신처 예규 「공무원보수 등의 업무지침」 공무원여비업무 처리기준</li>
-          <li>유가: 한국석유공사 오피넷 일별 전국 평균 판매가 (출장일 기준)</li>
-          <li>보정계수 <span id="capture-multiplier">1.3</span> 적용 (차량 감가·소모품·정비비 등 유지비 반영)</li>
-        </ol>
-      </div>
-
-      <div class="capture-section">
-        <p class="capture-section-title">1. 신청 정보</p>
-        <table class="capture-table">
-          <tr><td class="label">신청자</td><td id="cap-applicant"></td></tr>
-          <tr><td class="label">출장일자</td><td id="cap-date"></td></tr>
-          <tr><td class="label">출장 목적</td><td id="cap-purpose"></td></tr>
-          <tr><td class="label">차량</td><td id="cap-vehicle"></td></tr>
-          <tr><td class="label">기준 지점</td><td id="cap-office"></td></tr>
-          <tr><td class="label">방문/퇴근</td><td id="cap-pattern"></td></tr>
-        </table>
-      </div>
-
-      <div class="capture-section">
-        <p class="capture-section-title">2. 이동 경로 및 거리 산정</p>
-        <table class="capture-route-table">
-          <thead>
-            <tr><th>구간</th><th style="text-align:right;">실거리</th><th style="text-align:right;">인정거리</th><th>산정 사유</th></tr>
-          </thead>
-          <tbody id="cap-route-tbody"></tbody>
-          <tfoot>
-            <tr><td>총 인정거리</td><td></td><td class="km" id="cap-total-km"></td><td></td></tr>
-          </tfoot>
-        </table>
-        <p class="capture-total-sum" id="cap-total-sum"></p>
-      </div>
-
-      <div class="capture-section">
-        <p class="capture-section-title">3. 유류비 계산식</p>
-        <div class="capture-calc" id="cap-formula"></div>
-        <div class="capture-basis" id="cap-basis"></div>
-      </div>
-
-      <div class="capture-section">
-        <p class="capture-section-title">4. 지급 내역</p>
-        <table class="capture-total-table">
-          <tr><td>유류비</td><td style="text-align: right;" id="cap-fuel"></td></tr>
-          <tr><td>통행료 <span id="cap-toll-mark" class="receipt-attached-mark" style="display:none;">영수증 첨부</span></td><td style="text-align: right;" id="cap-toll"></td></tr>
-          <tr><td>주차비 <span id="cap-parking-mark" class="receipt-attached-mark" style="display:none;">영수증 첨부</span></td><td style="text-align: right;" id="cap-parking"></td></tr>
-          <tr class="total"><td>총 지급액</td><td style="text-align: right;" id="cap-total"></td></tr>
-        </table>
-      </div>
-
-      <div class="capture-section" id="cap-receipts-section" style="display: none; margin-bottom: 0;">
-        <p class="capture-section-title">5. 영수증</p>
-        <div class="capture-receipts">
-          <div id="cap-toll-receipt-wrap" style="display: none;">
-            <p class="capture-receipt-label">통행료 영수증</p>
-            <img id="cap-toll-receipt-img" alt="통행료 영수증">
-          </div>
-          <div id="cap-parking-receipt-wrap" style="display: none;">
-            <p class="capture-receipt-label">주차비 영수증</p>
-            <img id="cap-parking-receipt-img" alt="주차비 영수증">
-          </div>
+      <div id="to-dt-fields" style="display:none;">
+        <div class="dt-row">
+          <div class="field" style="margin-bottom:0;"><input type="date" id="to-date"></div>
+          <div class="field" style="margin-bottom:0;"><select id="to-time"></select></div>
         </div>
       </div>
     </div>
-
-    <div class="no-print" style="margin-top: 12px; display: grid; grid-template-columns: 1fr 2fr; gap: 8px;">
-      <button id="edit-btn" class="btn"><i class="ti ti-arrow-left"></i> 기안 수정</button>
-      <button id="pdf-btn" class="btn-primary" style="padding: 14px;"><i class="ti ti-download"></i> <span id="pdf-btn-label">저장</span></button>
+    <div class="sec-divider">도착지 특이사항</div>
+    <div id="to-auto-notices"></div>
+    <div class="notice-cards" id="to-notice-cards"></div>
+    <div class="field">
+      <label>추가 메모<span class="tag-opt">선택</span></label>
+      <input type="text" id="to-memo" placeholder="예) 파손 주의, 냉동 유지 필수">
+    </div>
+    <div class="sec-divider">결제 방식</div>
+    <div class="pill-group" id="pay-group">
+      <div class="pill sel" data-val="월정산">월정산</div>
+      <div class="pill" data-val="착불">착불</div>
+    </div>
+    <div class="section-bar"></div>
+    <div class="err-msg" id="err2-addr">배송 주소를 입력해주세요.</div>
+    <div class="err-msg" id="err2-contact">수령인/연락처를 입력해주세요.</div>
+    <div class="err-msg" id="err2-dt">도착 희망 일시를 선택해주세요.</div>
+    <div class="err-msg" id="err2-waypoint">경유지 정보를 모두 입력해주세요.</div>
+    <div class="btn-row">
+      <button class="btn" onclick="goTo(1)">이전</button>
+      <button class="btn primary" onclick="generate()">메시지 만들기</button>
     </div>
   </div>
 
+  <!-- Step 3: 결과 -->
+  <div class="step" id="s3">
+    <div class="step-label">완성</div>
+    <div class="step-title">카톡에 붙여넣기 하세요</div>
+    <div class="edit-toggle-row">
+      <button class="revert-btn" id="revert-btn" title="원본 메시지로 되돌립니다">↺ 원복</button>
+      <button class="edit-toggle" id="edit-toggle">✎ 직접 수정</button>
+    </div>
+    <div class="editing-hint" id="editing-hint">✏️ 편집 중 — 메시지를 직접 수정하세요. 완료 후 위 버튼을 누르세요.</div>
+    <div class="result-box" id="result-box">
+      <pre id="result-text"></pre>
+      <textarea id="result-textarea" style="display:none;"></textarea>
+    </div>
+    <button class="copy-btn" id="copy-btn" onclick="copyMsg()">복사하기</button>
+    <div class="result-nav">
+      <div class="nav-btn" onclick="goTo(0)">물품 정보 &<br>차량 수정</div>
+      <div class="nav-btn" onclick="goTo(1)">출발지<br>정보 수정</div>
+      <div class="nav-btn" onclick="goTo(2)">경유지·도착지<br>정보 수정</div>
+    </div>
+  </div>
 </div>
 
-<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
-// ============================================================
-// 📌 회사 정책 - 변경 시 이 부분만 수정 후 GitHub 푸시
-// ============================================================
-const CONFIG = {
-  // 버전 정보 (정책/기능 변경 시 함께 업데이트)
-  version: "v1.1",
-  lastUpdated: "2026-06-04",
+const SANS_KEYWORD = '수표로28길';
+const SANS_NOTICE = '오시는 길: 낙원상가에서 나오시다가 좌측에 익선동 노가리마켓 보이면 차 세우고, 부산오뎅과 노가리마켓 사이 골목으로 들어와주세요! 갈림길에서 우측으로 쭉 직진하셔서 벽면에 스테인리스 붙어있는 건물입니다.';
+const SHINSEGAE_KEYWORD = '신반포로 176';
+const SHINSEGAE_NOTICE = '매장 안쪽까지 이동 거리가 있습니다. 끌 차(핸드트럭) 필수 지참 부탁드리며, 물건을 끝까지 성실하게 운반해주실 기사님을 요청드립니다.';
+const SAMSUNG_KEYWORD = '삼성로 130';
+const SAMSUNG_NOTICE = '남문에서 출입 후 반 바퀴를 돌아야 하역장 출입구가 나옵니다. 보안검색이 엄격합니다. 방문 사전 등록 필수, 입장 시 신분증 제출 후 출입 표찰 교환이 필요합니다. 노트북 USB 등 저장매체가 있는 경우 출입 시 꼭 먼저 말씀해주시고, 보안스티커 부착후 내부로는 절대 반입 금지이니 차량에 두고 들어와 주세요. 삼성디지털시티 방문 경험 있는 기사님 선호합니다.';
 
-  // 회사 지점 목록 (출발/도착 기준 위치)
-  // 직원이 드롭다운에서 선택. 첫 번째 항목이 기본 선택됨.
-  offices: [
-    { name: "본사",        addr: "서울특별시 중구 청계천로 100", detail: "시그니처타워 서관" },
-    { name: "공장 (안산)",  addr: "경기도 안산시 단원구 별망로 35", detail: "" },
-    { name: "익선점",      addr: "서울특별시 종로구 수표로28길 30", detail: "" },
-    { name: "신세계강남",   addr: "서울특별시 서초구 신반포로 176", detail: "" }
-  ],
+// 자동감지 노티스 목록 — 새로 추가하려면 이 배열에 항목만 추가하면 됩니다.
+const AUTO_NOTICES = [
+  { id: 'sans',      keyword: SANS_KEYWORD,      label: '산스 (수표로28길 30)', body: SANS_NOTICE },
+  { id: 'shinsegae', keyword: SHINSEGAE_KEYWORD, label: '신세계 강남',           body: SHINSEGAE_NOTICE },
+  { id: 'samsung',   keyword: SAMSUNG_KEYWORD,   label: '삼성디지털시티',         body: SAMSUNG_NOTICE },
+];
+const PRESETS = [
+  { name: '모두먼트', short: '모두먼트', addr: '경기 이천시 마장면 프리미엄아울렛로 33-48 A동 2층 모두먼트', contact: '배준혁 010-5582-2921' },
+  { name: '삼우에프앤지', short: '냉장창고', addr: '경기 김포시 고촌읍 아라육로57번길 15 삼우 에프앤지', contact: '출고 현장 관리자 031-996-5404' },
+  { name: '일산창고', short: '일산창고', addr: '경기 고양시 덕양구 통일로 1031번길 458 대양물류보관창고(컨테이너창고)', contact: '창고 담당자 010-5472-6111' },
+  { name: '신세계 강남', short: '신강', addr: '서울 서초구 신반포로 176 신세계백화점 강남점 스위트파크 지하1층 산스sans', contact: '' },
+  { name: '산스 익선', short: '익선점', addr: '서울 종로구 수표로28길 30 산스 sans', contact: '' },
+  { name: '본사', short: '본사', addr: '서울 중구 청계천로 100 시그니처타워 서관 1040호', contact: '' },
+  { name: '현대 압구정', short: '현압', addr: '서울 강남구 압구정로 165 현대백화점 압구정본점 지하 2층 검품장', contact: '' },
+  { name: '삼성디지털시티', short: '삼성수원', addr: '경기 수원시 영통구 삼성로 130 삼성 수원 디지털시티 남문 출입 후 지하 1층 하역장 (높이2.4m)', contact: '' },
+];
+const FROM_NOTICES = [
+  { id: 'fn_carry', title: '출발지 주소까지 오셔서 직접 운반 필요', body: '출발지 주소까지 오셔서 직접 픽업하여 가져가셔야 합니다.' },
+  { id: 'fn_time', title: '픽업 시간 엄수', body: '안내드린 픽업 시간에 맞춰 도착해주세요. 일찍 도착하셔도 담당자가 없을 수 있으니 지정 시간까지 대기 부탁드립니다.' },
+  { id: 'fn_contact', title: '도착 전 연락 필수', body: '픽업 장소 도착 전 담당자에게 미리 연락해주세요.' },
+];
+const TO_NOTICES = [
+  { id: 'tn_carry', title: '도착지까지 직접 운반 필요', body: '도착지까지 직접 옮겨주셔야 합니다.' },
+  { id: 'tn_time', title: '도착 시간 엄수 — 조기 하차 불가', body: '안내드린 시간에 맞춰 도착해주세요. 일찍 도착하셔도 수령 담당자가 없을 수 있으니, 지정 시간 전 임의로 하차하지 말아 주시기 바랍니다.' },
+  { id: 'tn_contact', title: '도착 전 연락 필수', body: '하차 장소 도착 전 담당자에게 미리 연락해주세요.' },
+];
+const WAYPOINT_NOTICES = TO_NOTICES; // same as 도착지
 
-  // 보정계수 (차량 감가·소모품·정비비 등 유지비 반영)
-  multiplier: 1.3,
+const CONTACTS = [
+  { name: '김경훈', tel: '010-8261-3027' },
+  { name: '김도연', tel: '010-2012-0826' },
+  { name: '김도형', tel: '010-9449-9715' },
+  { name: '김은비', tel: '010-8581-7548' },
+  { name: '김태린', tel: '010-2707-2327' },
+  { name: '백수진', tel: '010-3143-1677' },
+  { name: '이나겸', tel: '010-7216-9274' },
+  { name: '이재강', tel: '010-6366-0061' },
+  { name: '이준상', tel: '010-8668-1019' },
+  { name: '이혜빈', tel: '010-3520-9405' },
+  { name: '인나래', tel: '010-4107-0906' },
+  { name: '정다솜', tel: '010-2317-7231' },
+  { name: '홍성훈', tel: '010-7123-0261' },
+  { name: '홍윤의', tel: '010-8765-2296' },
+];
+const AUTO_CONTACT_PRESETS = ['모두먼트', '삼우에프앤지', '일산창고'];
 
-  // 연료별 표준 연비 (km/L)
-  // 출처: 인사혁신처 예규 「공무원보수 등의 업무지침」 공무원여비업무 처리기준
-  // 고급휘발유는 정부 공식 별도 기준 없어 휘발유 연비를 준용 (회사 사규 규정)
-  mileage: {
-    gasoline: 11.97,
-    premiumGasoline: 11.97,  // 휘발유 연비 준용
-    diesel: 12.52,
-    lpg: 8.83,
-    hybrid: 15.37
-  },
+const state = { pay: '월정산', resultEditedText: null };
+const selectedFromNotices = new Set();
+const selectedToNotices = new Set();
 
-  // API 키 - 카카오 REST API (좌표 변환용)
-  // 카카오 개발자 사이트(developers.kakao.com)에서 발급
-  kakaoApiKey: "1652cd767cbc3a6a2c1af26e73d7890b",
+// Waypoints: array of { id, short, selectedNotices: Set, mode, refs: {...} }
+const waypoints = [];
+let waypointCounter = 0;
 
-  // 워커 URL (유가 조회 프록시)
-  workerOpinetUrl: "https://wakefuel.jslee-43a.workers.dev/opinet"
+function buildContactBtns(containerId, inputId) {
+  const wrap = document.getElementById(containerId);
+  const input = document.getElementById(inputId);
+  CONTACTS.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'contact-btn';
+    btn.textContent = c.name;
+    btn.addEventListener('click', () => {
+      if (btn.classList.contains('sel')) {
+        btn.classList.remove('sel');
+        input.value = '';
+      } else {
+        wrap.querySelectorAll('.contact-btn').forEach(b => b.classList.remove('sel'));
+        btn.classList.add('sel');
+        input.value = c.name + ' ' + c.tel;
+        clearInputError(input);
+      }
+    });
+    wrap.appendChild(btn);
+  });
+}
+
+buildContactBtns('from-contact-btns', 'from-contact');
+buildContactBtns('to-contact-btns', 'to-contact');
+
+function renderAutoNotices(containerElOrId, addr) {
+  const el = typeof containerElOrId === 'string' ? document.getElementById(containerElOrId) : containerElOrId;
+  if (!el) return;
+  const matched = AUTO_NOTICES.filter(n => addr && addr.includes(n.keyword));
+  el.innerHTML = matched.map(n => `
+    <div class="auto-notice">
+      <div class="alabel">자동 감지 — ${n.label}</div>
+      <div class="abody">${n.body}</div>
+    </div>
+  `).join('');
+}
+
+function buildTimeSelect(elOrId) {
+  const sel = typeof elOrId === 'string' ? document.getElementById(elOrId) : elOrId;
+  sel.innerHTML = '<option value="">시간 선택</option>';
+  for (let h = 0; h < 24; h++) {
+    for (let m of [0, 15, 30, 45]) {
+      const hh = String(h).padStart(2,'0'), mm = String(m).padStart(2,'0');
+      const ampm = h < 12 ? '오전' : '오후';
+      const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+      sel.innerHTML += `<option value="${hh}:${mm}">${ampm} ${h12}시${m > 0 ? ' ' + mm + '분' : ''}</option>`;
+    }
+  }
+}
+
+function setupQuickTime(groupId, fieldsId, stateKey) {
+  document.getElementById(groupId).querySelectorAll('.pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById(groupId).querySelectorAll('.pill').forEach(b => b.classList.remove('sel','err-field'));
+      btn.classList.add('sel');
+      document.getElementById(fieldsId).style.display = btn.dataset.mode === 'pick' ? 'block' : 'none';
+      state[stateKey] = btn.dataset.mode === 'pick' ? null : btn.dataset.mode;
+    });
+  });
+}
+
+document.getElementById('pay-group').querySelectorAll('.pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.getElementById('pay-group').querySelectorAll('.pill').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    state.pay = btn.dataset.val;
+  });
+});
+
+buildTimeSelect('from-time');
+buildTimeSelect('to-time');
+setupQuickTime('from-quick', 'from-dt-fields', 'fromMode');
+setupQuickTime('to-quick', 'to-dt-fields', 'toMode');
+
+document.getElementById('from-addr').addEventListener('input', e => {
+  renderAutoNotices('from-auto-notices', e.target.value);
+  document.getElementById('from-presets').querySelectorAll('.preset-btn').forEach(b => b.classList.remove('sel'));
+  document.getElementById('from-contact-btns').querySelectorAll('.contact-btn').forEach(b => b.disabled = false);
+  state.fromShort = null;
+});
+document.getElementById('to-addr').addEventListener('input', e => {
+  renderAutoNotices('to-auto-notices', e.target.value);
+  document.getElementById('to-presets').querySelectorAll('.preset-btn').forEach(b => b.classList.remove('sel'));
+  document.getElementById('to-contact-btns').querySelectorAll('.contact-btn').forEach(b => b.disabled = false);
+  state.toShort = null;
+});
+
+// 입력 시 에러 표시 자동 해제
+// input.value가 비어있지 않으면 err-field 클래스와 매칭된 err-msg를 즉시 숨김
+// input 이벤트뿐 아니라, 코드로 값이 세팅되는 경우에도 clearInputError(input)을 호출해서 사용
+const ERR_MSG_MAP = {
+  'item': 'err0-item',
+  'from-addr': 'err1-addr',
+  'from-contact': 'err1-contact',
+  'to-addr': 'err2-addr',
+  'to-contact': 'err2-contact',
 };
-// ============================================================
-
-(function() {
-  const $ = (id) => document.getElementById(id);
-  const fmt = (n) => Math.round(n).toLocaleString('ko-KR');
-  let lastCalc = null;
-  let officeCoord = null;
-  let selectedOfficeIdx = 0;  // 선택된 회사 지점 인덱스
-  let receipts = { toll: null, parking: null };
-  let visits = [];
-  let departType = 'via-office';
-  let returnType = 'via-office';
-  let coordCache = {};
-  let currentFuelData = { tradeDate: '', fallback: false, fallbackReason: '' };
-  let currentPrices = { gasoline: 1700, premiumGasoline: 2100, diesel: 1550, lpg: 1100 };
-
-  const FUEL_LABELS = { gasoline: '휘발유', premiumGasoline: '고급휘발유', diesel: '경유', lpg: 'LPG', hybrid: '하이브리드' };
-  const OFFICIAL_FUEL_NAMES = { gasoline: '휘발유', premiumGasoline: '고급휘발유', diesel: '자동차용경유', lpg: 'LPG' };
-
-  function updateHomeAddrVisibility() {
-    const departDirect = departType === 'direct';
-    const returnDirect = returnType === 'direct';
-
-    if (departDirect && returnDirect) {
-      $('home-inline-depart').classList.add('show');
-      $('home-inline-return').classList.remove('show');
-      $('home-inline-share').classList.add('show');
-      $('home-inline-note-depart').style.display = 'block';
-    } else if (departDirect && !returnDirect) {
-      $('home-inline-depart').classList.add('show');
-      $('home-inline-return').classList.remove('show');
-      $('home-inline-share').classList.remove('show');
-      $('home-inline-note-depart').style.display = 'none';
-    } else if (!departDirect && returnDirect) {
-      $('home-inline-depart').classList.remove('show');
-      $('home-inline-return').classList.add('show');
-      $('home-inline-share').classList.remove('show');
-      $('home-inline-note-depart').style.display = 'none';
-    } else {
-      $('home-inline-depart').classList.remove('show');
-      $('home-inline-return').classList.remove('show');
-      $('home-inline-share').classList.remove('show');
-      $('home-inline-note-depart').style.display = 'none';
-    }
+function clearInputError(input) {
+  if (!input || !input.value || !input.value.trim()) return;
+  input.classList.remove('err-field');
+  const errId = ERR_MSG_MAP[input.id];
+  if (errId) {
+    const err = document.getElementById(errId);
+    if (err) err.style.display = 'none';
   }
+}
+function attachAutoClearError(inputId) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  input.addEventListener('input', () => clearInputError(input));
+}
+Object.keys(ERR_MSG_MAP).forEach(attachAutoClearError);
 
-  // 개인 정보만 LocalStorage에 저장 (회사 정책은 코드 상수)
-  function load() {
-    try {
-      const personal = ['applicant','department','carnum','fuel-type','home-addr','home-addr-detail'];
-      personal.forEach(k => {
-        const v = localStorage.getItem('tc-' + k);
-        if (v !== null && $(k)) $(k).value = v;
-      });
-      const homeAddr = localStorage.getItem('tc-home-addr');
-      const homeDetail = localStorage.getItem('tc-home-addr-detail');
-      if (homeAddr) $('home-addr-2').value = homeAddr;
-      if (homeDetail) $('home-addr-2-detail').value = homeDetail;
+function setContactBtnsDisabled(containerOrId, disabled) {
+  const container = typeof containerOrId === 'string' ? document.getElementById(containerOrId) : containerOrId;
+  container.querySelectorAll('.contact-btn').forEach(b => {
+    b.disabled = disabled;
+    if (disabled) b.classList.remove('sel');
+  });
+}
 
-      const lat = localStorage.getItem('tc-home-addr-lat');
-      const lng = localStorage.getItem('tc-home-addr-lng');
-      if (lat && lng) {
-        $('home-addr').dataset.lat = lat;
-        $('home-addr').dataset.lng = lng;
-        $('home-addr-2').dataset.lat = lat;
-        $('home-addr-2').dataset.lng = lng;
+function buildPresets(containerId, type) {
+  const el = document.getElementById(containerId);
+  PRESETS.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn';
+    btn.innerHTML = `<div style="overflow:hidden;flex:1;min-width:0;"><div class="preset-name">${p.name}</div><div class="preset-addr">${p.addr}</div></div><span class="preset-arrow">→</span>`;
+    btn.addEventListener('click', () => {
+      const addrId = type === 'from' ? 'from-addr' : 'to-addr';
+      const contactId = type === 'from' ? 'from-contact' : 'to-contact';
+      const autoNoticesId = type === 'from' ? 'from-auto-notices' : 'to-auto-notices';
+      const contactBtnsId = type === 'from' ? 'from-contact-btns' : 'to-contact-btns';
+      if (btn.classList.contains('sel')) {
+        btn.classList.remove('sel');
+        document.getElementById(addrId).value = '';
+        document.getElementById(contactId).value = '';
+        renderAutoNotices(autoNoticesId, '');
+        setContactBtnsDisabled(contactBtnsId, false);
+        if (type === 'from') state.fromShort = null;
+        else state.toShort = null;
+      } else {
+        el.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('sel'));
+        btn.classList.add('sel');
+        document.getElementById(addrId).value = p.addr;
+        document.getElementById(contactId).value = p.contact;
+        renderAutoNotices(autoNoticesId, p.addr);
+        setContactBtnsDisabled(contactBtnsId, AUTO_CONTACT_PRESETS.includes(p.name));
+        clearInputError(document.getElementById(addrId));
+        clearInputError(document.getElementById(contactId));
+        if (type === 'from') state.fromShort = p.short;
+        else state.toShort = p.short;
       }
-
-      // 옛 버전 LocalStorage 데이터 정리 (정책은 이제 코드에서 관리)
-      const obsoleteKeys = [
-        'tc-cfg-gas', 'tc-cfg-diesel', 'tc-cfg-lpg',
-        'tc-cfg-mileage-gas', 'tc-cfg-mileage-diesel', 'tc-cfg-mileage-lpg', 'tc-cfg-mileage-hybrid',
-        'tc-cfg-mult', 'tc-cfg-office-addr', 'tc-cfg-office-addr-detail',
-        'tc-office-addr', 'tc-office-addr-detail', 'tc-office-lat', 'tc-office-lng', 'tc-office-cached-addr',
-        'tc-opinet-status', 'tc-opinet-trade-date'
-      ];
-      obsoleteKeys.forEach(k => localStorage.removeItem(k));
-
-      // 마지막 선택한 지점 복원
-      const savedOfficeIdx = localStorage.getItem('tc-selected-office-idx');
-      if (savedOfficeIdx !== null) {
-        const idx = parseInt(savedOfficeIdx);
-        if (idx >= 0 && idx < CONFIG.offices.length) selectedOfficeIdx = idx;
-      }
-    } catch (e) {}
-  }
-  function save(key, value) { try { localStorage.setItem('tc-' + key, value); } catch (e) {} }
-
-  function formatTradeDate(dt) {
-    if (!dt || dt.length < 8) return '';
-    return `${dt.slice(0,4)}-${dt.slice(4,6)}-${dt.slice(6,8)}`;
-  }
-  function getTripDateYYYYMMDD() {
-    const v = $('trip-date').value;
-    if (!v) return '';
-    return v.replace(/-/g, '');
-  }
-
-  function getMileage(fuel) {
-    return CONFIG.mileage[fuel] || 12;
-  }
-  function getFuelPrice(fuel) {
-    if (fuel === 'hybrid') return currentPrices.gasoline;  // 하이브리드는 휘발유 단가 준용
-    return currentPrices[fuel] || 1700;
-  }
-
-  function updateFuelInfo() {
-    const fuel = $('fuel-type').value;
-    const mileage = getMileage(fuel);
-    const price = getFuelPrice(fuel);
-    const tradeDate = formatTradeDate(currentFuelData.tradeDate);
-    const officialName = fuel === 'hybrid' ? '휘발유' : OFFICIAL_FUEL_NAMES[fuel];
-    const dateText = tradeDate ? `${tradeDate} 전국평균` : '전국평균';
-    
-    // 표준 연비 안내
-    let mileageNote = '— 공무원 여비업무 처리기준 (인사혁신처)';
-    if (fuel === 'premiumGasoline') {
-      mileageNote = '— 공무원 여비업무 처리기준 휘발유 연비 준용 (인사혁신처, 고급휘발유 별도 기준 부재)';
-    }
-    let html = `<span class="fuel-info-line"><strong>표준 연비:</strong> ${mileage} km/L <span class="fuel-info-source">${mileageNote}</span></span>`;
-    
-    // 유가 안내
-    if (fuel === 'hybrid') {
-      html += `<span class="fuel-info-line"><strong>유가:</strong> ${fmt(price)} 원/L <span class="fuel-info-source">— 한국석유공사 오피넷 ${officialName} ${dateText} (하이브리드는 휘발유 단가 준용)</span></span>`;
-    } else {
-      html += `<span class="fuel-info-line"><strong>유가:</strong> ${fmt(price)} 원/L <span class="fuel-info-source">— 한국석유공사 오피넷 ${officialName} ${dateText}</span></span>`;
-    }
-    $('fuel-info').innerHTML = html;
-
-    const fallbackEl = $('fuel-fallback-notice');
-    if (currentFuelData.fallback) {
-      let msg = '';
-      if (currentFuelData.fallbackReason === 'exceeds_7days') {
-        msg = `⚠️ 출장일자가 7일 이상 지나 오피넷에서 해당일 유가를 조회할 수 없어, 오늘(${tradeDate}) 유가를 적용합니다.`;
-      } else if (currentFuelData.fallbackReason === 'future_date') {
-        msg = `⚠️ 출장일이 도래하지 않아 오늘(${tradeDate}) 유가를 적용합니다.`;
-      }
-      fallbackEl.textContent = msg;
-      fallbackEl.style.display = 'block';
-    } else {
-      fallbackEl.style.display = 'none';
-    }
-  }
-
-  async function fetchOpinetPricesForTripDate() {
-    const tripDate = getTripDateYYYYMMDD();
-    let url = CONFIG.workerOpinetUrl;
-    if (tripDate) url += `?date=${tripDate}`;
-
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
-      if (data.success && data.prices) {
-        if (data.prices.gasoline) currentPrices.gasoline = data.prices.gasoline;
-        if (data.prices.premiumGasoline) currentPrices.premiumGasoline = data.prices.premiumGasoline;
-        if (data.prices.diesel) currentPrices.diesel = data.prices.diesel;
-        if (data.prices.lpg) currentPrices.lpg = data.prices.lpg;
-
-        currentFuelData = {
-          tradeDate: data.tradeDate || '',
-          fallback: data.fallback || false,
-          fallbackReason: data.fallbackReason || ''
-        };
-        updateFuelInfo();
-        return true;
-      } else { throw new Error(data.error || '데이터 없음'); }
-    } catch (e) {
-      console.warn('오피넷 자동 조회 실패:', e.message);
-      return false;
-    }
-  }
-
-  function setupReceipt(type) {
-    $(type + '-receipt').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      if (file.size > 5 * 1024 * 1024) { alert('파일 크기는 5MB 이하여야 합니다.'); return; }
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        receipts[type] = ev.target.result;
-        $(type + '-receipt-img').src = ev.target.result;
-        $(type + '-receipt-preview').style.display = 'block';
-        $(type + '-upload-btn').style.display = 'none';
-      };
-      reader.readAsDataURL(file);
     });
-  }
-  window.removeReceipt = function(type) {
-    receipts[type] = null;
-    $(type + '-receipt-preview').style.display = 'none';
-    $(type + '-upload-btn').style.display = 'block';
-    $(type + '-receipt').value = '';
-  };
+    el.appendChild(btn);
+  });
+}
 
-  window.searchAddr = function(targetId) {
-    if (typeof daum === 'undefined' || !daum.Postcode) { alert('주소 검색 스크립트가 로드되지 않았습니다.'); return; }
-    new daum.Postcode({
-      oncomplete: function(data) {
-        const addr = data.roadAddress || data.jibunAddress;
-        const el = $(targetId);
-        const oldAddr = el.value;
-        el.value = addr;
-        if (el.dataset) { el.dataset.lat = ''; el.dataset.lng = ''; }
-
-        if (targetId === 'home-addr' || targetId === 'home-addr-2') {
-          $('home-addr').value = addr;
-          $('home-addr-2').value = addr;
-          $('home-addr').dataset.lat = '';
-          $('home-addr').dataset.lng = '';
-          $('home-addr-2').dataset.lat = '';
-          $('home-addr-2').dataset.lng = '';
-          save('home-addr', addr);
-          localStorage.removeItem('tc-home-addr-lat');
-          localStorage.removeItem('tc-home-addr-lng');
-          if (oldAddr !== addr) invalidateDistance();
-        }
-        if (targetId.startsWith('visit-addr-')) {
-          const visitId = targetId.replace('visit-addr-', '');
-          const visit = visits.find(v => v.id === visitId);
-          if (visit) {
-            const wasChanged = visit.addr !== addr;
-            visit.addr = addr; visit.lat = null; visit.lng = null;
-            if (wasChanged) invalidateDistance();
-          }
-        }
-      }
-    }).open();
-  };
-
-  async function kakaoGeocode(addr) {
-    if (!CONFIG.kakaoApiKey || CONFIG.kakaoApiKey === '여기에_본인_카카오_REST_API_키_입력') {
-      throw new Error('CONFIG에 카카오 API 키를 설정해주세요');
-    }
-    if (coordCache[addr]) return coordCache[addr];
-    const url = `https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(addr)}`;
-    const res = await fetch(url, { headers: { 'Authorization': `KakaoAK ${CONFIG.kakaoApiKey}` } });
-    if (!res.ok) {
-      if (res.status === 401) throw new Error('카카오 API 키가 잘못되었습니다');
-      throw new Error('주소 변환 실패 (HTTP ' + res.status + ')');
-    }
-    const data = await res.json();
-    if (!data.documents || data.documents.length === 0) {
-      const url2 = `https://dapi.kakao.com/v2/local/search/keyword.json?query=${encodeURIComponent(addr)}`;
-      const res2 = await fetch(url2, { headers: { 'Authorization': `KakaoAK ${CONFIG.kakaoApiKey}` } });
-      if (!res2.ok) throw new Error('주소를 찾을 수 없음');
-      const data2 = await res2.json();
-      if (!data2.documents || data2.documents.length === 0) throw new Error('주소를 찾을 수 없음: ' + addr);
-      const coord = { lat: parseFloat(data2.documents[0].y), lng: parseFloat(data2.documents[0].x) };
-      coordCache[addr] = coord;
-      return coord;
-    }
-    const coord = { lat: parseFloat(data.documents[0].y), lng: parseFloat(data.documents[0].x) };
-    coordCache[addr] = coord;
-    return coord;
-  }
-
-  async function osrmDistance(from, to) {
-    const url = `https://router.project-osrm.org/route/v1/driving/${from.lng},${from.lat};${to.lng},${to.lat}?overview=false`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('경로 조회 실패');
-    const data = await res.json();
-    if (data.code !== 'Ok' || !data.routes || data.routes.length === 0) throw new Error('경로 없음');
-    return data.routes[0].distance / 1000;
-  }
-  function haversine(a, b) {
-    const R = 6371;
-    const toRad = x => x * Math.PI / 180;
-    const dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng);
-    const lat1 = toRad(a.lat), lat2 = toRad(b.lat);
-    const x = Math.sin(dLat/2)**2 + Math.sin(dLng/2)**2 * Math.cos(lat1) * Math.cos(lat2);
-    return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1-x)) * 1.3;
-  }
-  async function distance(a, b) {
-    try { return await osrmDistance(a, b); }
-    catch (e) { return haversine(a, b); }
-  }
-
-  // 현재 선택된 지점 정보
-  function getSelectedOffice() {
-    return CONFIG.offices[selectedOfficeIdx] || CONFIG.offices[0];
-  }
-  function getOfficeFullAddr() {
-    const o = getSelectedOffice();
-    return o.detail ? `${o.addr} ${o.detail}` : o.addr;
-  }
-
-  async function getOfficeCoord() {
-    if (officeCoord) return officeCoord;
-    officeCoord = await kakaoGeocode(getSelectedOffice().addr);
-    return officeCoord;
-  }
-
-  async function getHomeCoord() {
-    let addr = $('home-addr').value.trim() || $('home-addr-2').value.trim();
-    if (!addr) throw new Error('자택 주소가 없습니다');
-
-    const el = $('home-addr').value.trim() ? $('home-addr') : $('home-addr-2');
-    if (el.dataset.lat && el.dataset.lng) {
-      return { lat: parseFloat(el.dataset.lat), lng: parseFloat(el.dataset.lng) };
-    }
-    const coord = await kakaoGeocode(addr);
-    $('home-addr').dataset.lat = coord.lat;
-    $('home-addr').dataset.lng = coord.lng;
-    $('home-addr-2').dataset.lat = coord.lat;
-    $('home-addr-2').dataset.lng = coord.lng;
-    save('home-addr-lat', coord.lat);
-    save('home-addr-lng', coord.lng);
-    return coord;
-  }
-
-  function addVisit(addr = '', detail = '') {
-    const id = 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
-    visits.push({ id, addr, detail, lat: null, lng: null });
-    renderVisits();
-    invalidateDistance();
-  }
-  window.removeVisit = function(id) {
-    if (visits.length <= 1) { alert('최소 1개의 출장지가 필요합니다.'); return; }
-    visits = visits.filter(v => v.id !== id);
-    renderVisits();
-    invalidateDistance();
-  };
-  window.moveVisit = function(id, direction) {
-    const idx = visits.findIndex(v => v.id === id);
-    if (idx === -1) return;
-    const newIdx = idx + direction;
-    if (newIdx < 0 || newIdx >= visits.length) return;
-    syncVisitsFromInputs();
-    [visits[idx], visits[newIdx]] = [visits[newIdx], visits[idx]];
-    renderVisits();
-    invalidateDistance();
-  };
-  function syncVisitsFromInputs() {
-    visits.forEach(v => {
-      const addrEl = $('visit-addr-' + v.id);
-      const detailEl = $('visit-detail-' + v.id);
-      if (addrEl) v.addr = addrEl.value;
-      if (detailEl) v.detail = detailEl.value;
+function buildNotices(containerId, notices, selectedSet) {
+  const el = document.getElementById(containerId);
+  notices.forEach(n => {
+    const card = document.createElement('div');
+    card.className = 'notice-card';
+    card.innerHTML = `<div class="ntitle">${n.title}</div><div class="nbody">${n.body}</div>`;
+    card.addEventListener('click', () => {
+      if (selectedSet.has(n.id)) { selectedSet.delete(n.id); card.classList.remove('sel'); }
+      else { selectedSet.add(n.id); card.classList.add('sel'); }
     });
-  }
-  function renderVisits() {
-    const container = $('visits-container');
-    container.innerHTML = visits.map((v, idx) => `
-      <div class="visit-card">
-        <div class="visit-card-header">
-          <p class="visit-card-title">출장지 ${idx + 1}</p>
-          <div class="visit-card-actions">
-            ${idx > 0 ? `<button class="icon-btn" onclick="moveVisit('${v.id}', -1)" title="위로"><i class="ti ti-arrow-up" style="font-size:12px;"></i></button>` : ''}
-            ${idx < visits.length - 1 ? `<button class="icon-btn" onclick="moveVisit('${v.id}', 1)" title="아래로"><i class="ti ti-arrow-down" style="font-size:12px;"></i></button>` : ''}
-            ${visits.length > 1 ? `<button class="icon-btn btn-danger" onclick="removeVisit('${v.id}')" title="삭제"><i class="ti ti-x" style="font-size:12px;"></i></button>` : ''}
-          </div>
-        </div>
-        <div class="addr-input-wrap" style="margin-bottom: 6px;">
-          <input type="text" id="visit-addr-${v.id}" value="${v.addr || ''}" placeholder="주소 찾기 클릭" readonly>
-          <button class="addr-search-btn" onclick="searchAddr('visit-addr-${v.id}')"><i class="ti ti-search"></i> 주소</button>
-        </div>
-        <input type="text" id="visit-detail-${v.id}" value="${v.detail || ''}" placeholder="상세주소 (선택)">
+    el.appendChild(card);
+  });
+}
+
+buildPresets('from-presets', 'from');
+buildPresets('to-presets', 'to');
+buildNotices('from-notice-cards', FROM_NOTICES, selectedFromNotices);
+buildNotices('to-notice-cards', TO_NOTICES, selectedToNotices);
+
+document.getElementById('vehicle-grid').querySelectorAll('.vcard').forEach(c => {
+  c.addEventListener('click', () => {
+    // 선택 토글
+    c.classList.toggle('sel');
+    // 에러 표시 제거 (전체)
+    document.getElementById('vehicle-grid').querySelectorAll('.vcard').forEach(x => x.classList.remove('err-field'));
+    // 선택된 차량 목록 갱신
+    const selected = Array.from(document.getElementById('vehicle-grid').querySelectorAll('.vcard.sel')).map(x => x.dataset.val);
+    state.vehicles = selected;
+    // "직접 입력" 입력란 표시 여부
+    document.getElementById('vehicle-other-wrap').style.display = selected.includes('직접 입력') ? 'block' : 'none';
+    // 냉장/냉동 온도 입력란 표시 여부 (선택된 것 중 하나라도 '냉장' 포함 시)
+    document.getElementById('temp-wrap').style.display = selected.some(v => v.includes('냉장')) ? 'block' : 'none';
+    document.getElementById('err0-vehicle').style.display = 'none';
+  });
+});
+
+// ===== Waypoint card builder =====
+function buildWaypointCard(wp) {
+  const card = document.createElement('div');
+  card.className = 'waypoint-card';
+  card.id = 'wp-' + wp.id;
+
+  card.innerHTML = `
+    <div class="wp-header">
+      <div class="wp-title">
+        <span class="wp-num-badge" data-role="num"></span>
+        <span>경유지 <span data-role="num-text"></span></span>
       </div>
-    `).join('');
-  }
+      <button class="wp-remove-btn" data-action="remove">삭제</button>
+    </div>
 
-  window.selectDepart = function(value) {
-    if (departType !== value) invalidateDistance();
-    departType = value;
-    document.querySelectorAll('.section-card .radio-group').forEach((group, gi) => {
-      if (gi === 0) {
-        group.querySelectorAll('.radio-card').forEach(card => {
-          card.classList.toggle('selected', card.dataset.value === value);
-        });
-      }
-    });
-    updateHomeAddrVisibility();
-  };
-  window.selectReturn = function(value) {
-    if (returnType !== value) invalidateDistance();
-    returnType = value;
-    document.querySelectorAll('.section-card .radio-group').forEach((group, gi) => {
-      if (gi === 1) {
-        group.querySelectorAll('.radio-card').forEach(card => {
-          card.classList.toggle('selected', card.dataset.value === value);
-        });
-      }
-    });
-    updateHomeAddrVisibility();
-  };
+    <div class="wp-sub-divider">자주 쓰는 주소</div>
+    <div class="preset-grid" data-role="presets"></div>
 
-  function validate() {
-    clearValidationErrors();
-    const errors = [];
-
-    if (!$('applicant').value.trim()) { errors.push('신청자명'); $('applicant').classList.add('err-field'); }
-    if (!$('department').value.trim()) { errors.push('소속/직급'); $('department').classList.add('err-field'); }
-    if (!$('trip-date').value) { errors.push('출장일자'); $('trip-date').classList.add('err-field'); }
-    if (!$('purpose').value.trim()) { errors.push('출장 목적'); $('purpose').classList.add('err-field'); }
-    if (!$('carnum').value.trim()) { errors.push('차량번호'); $('carnum').classList.add('err-field'); }
-
-    const needsHome = departType === 'direct' || returnType === 'direct';
-    if (needsHome) {
-      const homeAddr = $('home-addr').value.trim() || $('home-addr-2').value.trim();
-      if (!homeAddr) {
-        errors.push('자택 주소');
-        if (departType === 'direct') $('home-addr').classList.add('err-field');
-        if (returnType === 'direct') $('home-addr-2').classList.add('err-field');
-      }
-    }
-
-    syncVisitsFromInputs();
-    if (visits.length === 0 || !visits[0].addr) {
-      errors.push('출장지 (최소 1개)');
-    } else {
-      const emptyVisits = visits.filter(v => !v.addr);
-      if (emptyVisits.length > 0) errors.push('빈 출장지 주소');
-    }
-
-    if (!window._lastDistance && errors.length === 0) {
-      errors.push('"모든 거리 자동 조회" 버튼을 먼저 실행해주세요');
-    }
-
-    if (errors.length > 0) {
-      $('validation-error-msg').textContent = '필수 입력값을 확인해주세요: ' + errors.join(', ');
-      $('validation-error').style.display = 'block';
-      $('validation-error').scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return false;
-    }
-    return true;
-  }
-
-  function clearValidationErrors() {
-    document.querySelectorAll('.err-field').forEach(el => el.classList.remove('err-field'));
-    $('validation-error').style.display = 'none';
-  }
-
-  function invalidateDistance() {
-    if (window._lastDistance) {
-      window._lastDistance = null;
-      $('route-summary').innerHTML = `
-        <div class="route-summary-box" style="background: var(--warning-amber-tint); border-left-color: var(--warning-amber);">
-          <p class="route-summary-title" style="color: var(--warning-amber);"><i class="ti ti-alert-triangle" style="font-size:11px;"></i> 정보가 변경되었습니다</p>
-          <p class="route-summary-line" style="color: var(--warning-amber);">출장지·자택·방문 형태가 변경되어 거리 재조회가 필요합니다. "모든 거리 자동 조회" 버튼을 다시 눌러주세요.</p>
+    <div class="field">
+      <label>경유지 주소<span class="req">*</span></label>
+      <input type="text" data-role="addr" placeholder="주소를 직접 입력하거나 위에서 선택하세요">
+    </div>
+    <div class="field">
+      <label>담당자 / 연락처<span class="req">*</span></label>
+      <input type="text" data-role="contact" placeholder="예) 홍길동 010-0000-0000">
+      <div class="contact-btns" data-role="contact-btns" style="margin-top:8px; margin-bottom:0;"></div>
+    </div>
+    <div class="datetime-wrap">
+      <label>경유 희망 일시<span class="req" style="color:var(--error-red);">*</span></label>
+      <div class="pill-group" data-role="quick">
+        <div class="pill" data-mode="asap">최대한 빠르게</div>
+        <div class="pill" data-mode="pick">날짜/시간 선택</div>
+      </div>
+      <div data-role="dt-fields" style="display:none;">
+        <div class="dt-row">
+          <div class="field" style="margin-bottom:0;"><input type="date" data-role="date"></div>
+          <div class="field" style="margin-bottom:0;"><select data-role="time"></select></div>
         </div>
-      `;
-      $('route-summary').style.display = 'block';
-      $('distance-source').textContent = '';
-    }
-  }
+      </div>
+    </div>
+    <div class="wp-sub-divider">경유지 특이사항</div>
+    <div data-role="auto-notices"></div>
+    <div class="notice-cards" data-role="notice-cards"></div>
+    <div class="field">
+      <label>경유 메모<span class="tag-opt">선택</span></label>
+      <input type="text" data-role="memo" placeholder="예) 1층 물류창고 앞, 사전 연락 필요">
+    </div>
+  `;
 
-  function getSumExpression() {
-    const d = window._lastDistance;
-    if (!d) return '';
-    const parts = [d.departKm.toFixed(1)];
-    d.interSegments.forEach(s => parts.push(s.km.toFixed(1)));
-    parts.push(d.returnKm.toFixed(1));
-    return parts.join(' + ');
-  }
+  const addr = card.querySelector('[data-role="addr"]');
+  const contact = card.querySelector('[data-role="contact"]');
+  const contactBtns = card.querySelector('[data-role="contact-btns"]');
+  const presetsEl = card.querySelector('[data-role="presets"]');
+  const autoNoticesEl = card.querySelector('[data-role="auto-notices"]');
+  const noticeCardsEl = card.querySelector('[data-role="notice-cards"]');
+  const quickEl = card.querySelector('[data-role="quick"]');
+  const dtFieldsEl = card.querySelector('[data-role="dt-fields"]');
+  const dateEl = card.querySelector('[data-role="date"]');
+  const timeEl = card.querySelector('[data-role="time"]');
+  const memoEl = card.querySelector('[data-role="memo"]');
+  const removeBtn = card.querySelector('[data-action="remove"]');
 
-  async function autoCalcDistance() {
-    syncVisitsFromInputs();
-    const needsHome = departType === 'direct' || returnType === 'direct';
-    if (needsHome) {
-      const homeAddr = $('home-addr').value.trim() || $('home-addr-2').value.trim();
-      if (!homeAddr) { alert('직출 또는 직퇴 선택 시 자택 주소를 입력해주세요.'); return; }
-    }
-    if (visits.length === 0 || !visits[0].addr) { alert('최소 1개의 출장지를 입력해주세요.'); return; }
-    for (const v of visits) {
-      if (!v.addr) { alert('모든 출장지 주소를 입력해주세요.'); return; }
-    }
+  wp.refs = { card, addr, contact, dateEl, timeEl, memoEl, quickEl, autoNoticesEl, presetsEl, contactBtns, numBadge: card.querySelector('[data-role="num"]'), numText: card.querySelector('[data-role="num-text"]') };
 
-    const btn = $('auto-calc-btn');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spin"><i class="ti ti-loader-2"></i></span> 조회 중...';
-    $('distance-source').textContent = '';
-    $('route-summary').style.display = 'none';
-
-    try {
-      const home = needsHome ? await getHomeCoord() : null;
-      const office = await getOfficeCoord();
-      for (const v of visits) {
-        if (!v.lat || !v.lng) {
-          const c = await kakaoGeocode(v.addr);
-          v.lat = c.lat; v.lng = c.lng;
-        }
-      }
-
-      const firstVisit = { lat: visits[0].lat, lng: visits[0].lng };
-      const lastVisit = { lat: visits[visits.length-1].lat, lng: visits[visits.length-1].lng };
-
-      let departKm, departLogic, departActualKm, departReason;
-      if (departType === 'via-office') {
-        departKm = await distance(office, firstVisit);
-        departActualKm = departKm;
-        departLogic = `회사 출근 후 출장지로: 회사→출장지1 = ${departKm.toFixed(1)}km`;
-        departReason = '회사 출근 후 출발';
+  // contact buttons
+  CONTACTS.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'contact-btn';
+    btn.textContent = c.name;
+    btn.addEventListener('click', () => {
+      if (btn.classList.contains('sel')) {
+        btn.classList.remove('sel');
+        contact.value = '';
       } else {
-        const dHome = await distance(home, firstVisit);
-        const dOffice = await distance(office, firstVisit);
-        departActualKm = dHome;
-        if (dHome <= dOffice) {
-          departKm = dHome;
-          departLogic = `직출: 집~출장지1(${dHome.toFixed(1)}km)이 회사~출장지1(${dOffice.toFixed(1)}km)보다 짧아 ${dHome.toFixed(1)}km 인정`;
-          departReason = `집 경로(${dHome.toFixed(1)}km)가 회사 경로(${dOffice.toFixed(1)}km)보다 짧아 인정`;
-        } else {
-          departKm = dOffice;
-          departLogic = `직출: 회사~출장지1(${dOffice.toFixed(1)}km)이 집~출장지1(${dHome.toFixed(1)}km)보다 짧아 ${dOffice.toFixed(1)}km 인정`;
-          departReason = `회사 경로(${dOffice.toFixed(1)}km)가 집 경로(${dHome.toFixed(1)}km)보다 짧아 회사기준 적용`;
-        }
+        contactBtns.querySelectorAll('.contact-btn').forEach(b => b.classList.remove('sel'));
+        btn.classList.add('sel');
+        contact.value = c.name + ' ' + c.tel;
+        if (contact.value.trim()) contact.classList.remove('err-field');
       }
+    });
+    contactBtns.appendChild(btn);
+  });
 
-      let interKm = 0;
-      const interSegments = [];
-      for (let i = 0; i < visits.length - 1; i++) {
-        const from = { lat: visits[i].lat, lng: visits[i].lng };
-        const to = { lat: visits[i+1].lat, lng: visits[i+1].lng };
-        const d = await distance(from, to);
-        interKm += d;
-        interSegments.push({ from: i+1, to: i+2, km: d });
-      }
+  // time select
+  buildTimeSelect(timeEl);
 
-      let returnKm, returnLogic, returnActualKm, returnReason;
-      if (returnType === 'via-office') {
-        returnKm = await distance(lastVisit, office);
-        returnActualKm = returnKm;
-        returnLogic = `회사 복귀 후 퇴근: 출장지${visits.length}→회사 = ${returnKm.toFixed(1)}km`;
-        returnReason = '회사 복귀 후 퇴근';
+  // presets
+  PRESETS.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn';
+    btn.innerHTML = `<div style="overflow:hidden;flex:1;min-width:0;"><div class="preset-name">${p.name}</div><div class="preset-addr">${p.addr}</div></div><span class="preset-arrow">→</span>`;
+    btn.addEventListener('click', () => {
+      if (btn.classList.contains('sel')) {
+        btn.classList.remove('sel');
+        addr.value = '';
+        contact.value = '';
+        renderAutoNotices(autoNoticesEl, '');
+        setContactBtnsDisabled(contactBtns, false);
+        wp.short = null;
       } else {
-        const dHome = await distance(lastVisit, home);
-        const dOffice = await distance(lastVisit, office);
-        returnActualKm = dHome;
-        if (dHome <= dOffice) {
-          returnKm = dHome;
-          returnLogic = `직퇴: 출장지${visits.length}~집(${dHome.toFixed(1)}km)이 출장지${visits.length}~회사(${dOffice.toFixed(1)}km)보다 짧아 ${dHome.toFixed(1)}km 인정`;
-          returnReason = `집 경로(${dHome.toFixed(1)}km)가 회사 경로(${dOffice.toFixed(1)}km)보다 짧아 인정`;
-        } else {
-          returnKm = dOffice;
-          returnLogic = `직퇴: 출장지${visits.length}~회사(${dOffice.toFixed(1)}km)이 출장지${visits.length}~집(${dHome.toFixed(1)}km)보다 짧아 ${dOffice.toFixed(1)}km 인정`;
-          returnReason = `회사 경로(${dOffice.toFixed(1)}km)가 집 경로(${dHome.toFixed(1)}km)보다 짧아 회사기준 적용`;
-        }
+        presetsEl.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('sel'));
+        btn.classList.add('sel');
+        addr.value = p.addr;
+        contact.value = p.contact;
+        renderAutoNotices(autoNoticesEl, p.addr);
+        setContactBtnsDisabled(contactBtns, AUTO_CONTACT_PRESETS.includes(p.name));
+        if (addr.value.trim()) addr.classList.remove('err-field');
+        if (contact.value.trim()) contact.classList.remove('err-field');
+        wp.short = p.short;
       }
-
-      const totalKm = departKm + interKm + returnKm;
-
-      window._lastDistance = {
-        departKm, departLogic, departActualKm, departReason,
-        interKm, interSegments,
-        returnKm, returnLogic, returnActualKm, returnReason,
-        totalKm,
-        home, office, visits: visits.map(v => ({...v}))
-      };
-
-      $('distance-source').textContent = '📍 실제 도로 기준 최단 거리';
-      $('route-summary').innerHTML = `
-        <div class="route-summary-box">
-          <p class="route-summary-title"><i class="ti ti-route" style="font-size:11px;"></i> 경로 요약</p>
-          <p class="route-summary-line">• ${departLogic}</p>
-          ${interSegments.map(s => `<p class="route-summary-line">• 출장지${s.from}→출장지${s.to}: ${s.km.toFixed(1)}km</p>`).join('')}
-          <p class="route-summary-line">• ${returnLogic}</p>
-          <p class="route-summary-total">총 인정거리: ${getSumExpression()} = ${totalKm.toFixed(1)} km</p>
-        </div>
-      `;
-      $('route-summary').style.display = 'block';
-
-      btn.disabled = false;
-      btn.innerHTML = '<i class="ti ti-map-search"></i> 모든 거리 자동 조회';
-    } catch (e) {
-      alert('거리 조회 실패: ' + e.message);
-      btn.disabled = false;
-      btn.innerHTML = '<i class="ti ti-map-search"></i> 모든 거리 자동 조회';
-    }
-  }
-
-  function calculate() {
-    if (!validate()) return;
-    syncVisitsFromInputs();
-
-    const applicant = $('applicant').value.trim();
-    const department = $('department').value.trim();
-    const tripDate = $('trip-date').value;
-    const purpose = $('purpose').value.trim();
-    const carNumber = $('carnum').value.trim();
-    const fuelType = $('fuel-type').value;
-    const fuelLabel = FUEL_LABELS[fuelType];
-    const mileage = getMileage(fuelType);
-    const fuelPrice = getFuelPrice(fuelType);
-    const tradeDate = formatTradeDate(currentFuelData.tradeDate);
-    const fallback = currentFuelData.fallback;
-    const fallbackReason = currentFuelData.fallbackReason;
-
-    const d = window._lastDistance;
-    const multiplier = CONFIG.multiplier;
-    const fuelUsed = d.totalKm / mileage;
-    const rawFuelCost = fuelUsed * fuelPrice;
-    const adjustedFuelCost = rawFuelCost * multiplier;
-    const toll = parseFloat($('toll').value) || 0;
-    const parking = parseFloat($('parking').value) || 0;
-    const totalCost = adjustedFuelCost + toll + parking;
-
-    const departLabel = departType === 'via-office' ? '회사 출근 후 출장지로' : '직출';
-    const returnLabel = returnType === 'via-office' ? '회사 복귀 후 퇴근' : '직퇴';
-
-    lastCalc = {
-      applicant, department, tripDate, purpose, carNumber,
-      fuelType, fuelLabel, mileage, fuelPrice, multiplier, 
-      opinetTradeDate: tradeDate, fallback, fallbackReason,
-      departType, returnType, departLabel, returnLabel,
-      visits: visits.map(v => ({...v})),
-      ...d,
-      fuelUsed, rawFuelCost, adjustedFuelCost, toll, parking, totalCost
-    };
-
-    $('capture-date').textContent = `작성일: ${new Date().toLocaleDateString('ko-KR')}`;
-    $('cap-applicant').textContent = department ? `${applicant} (${department})` : applicant;
-    $('cap-date').textContent = tripDate;
-    $('cap-purpose').textContent = purpose;
-    $('cap-vehicle').textContent = `${fuelLabel} (${mileage}km/L) / ${carNumber}`;
-    const selOffice = getSelectedOffice();
-    $('cap-office').textContent = `${selOffice.name} (${getOfficeFullAddr()})`;
-    $('cap-pattern').textContent = `${departLabel} → ${returnLabel}`;
-    $('capture-multiplier').textContent = multiplier;
-
-    const rows = [];
-    if (departType === 'via-office') {
-      rows.push({ seg: '회사 → 출장지1', actual: d.departKm, recognized: d.departKm, reason: d.departReason });
-    } else {
-      rows.push({ seg: `집 → 출장지1 (직출)`, actual: d.departActualKm, recognized: d.departKm, reason: d.departReason });
-    }
-    d.interSegments.forEach(s => {
-      rows.push({ seg: `출장지${s.from} → 출장지${s.to}`, actual: s.km, recognized: s.km, reason: '출장지 간 실제 이동' });
     });
-    if (returnType === 'via-office') {
-      rows.push({ seg: `출장지${visits.length} → 회사`, actual: d.returnKm, recognized: d.returnKm, reason: d.returnReason });
-    } else {
-      rows.push({ seg: `출장지${visits.length} → 집 (직퇴)`, actual: d.returnActualKm, recognized: d.returnKm, reason: d.returnReason });
-    }
-
-    $('cap-route-tbody').innerHTML = rows.map(r => `
-      <tr>
-        <td>${r.seg}</td>
-        <td class="km">${r.actual.toFixed(1)} km</td>
-        <td class="km">${r.recognized.toFixed(1)} km</td>
-        <td style="font-size: 11px; color: var(--gray-700);">${r.reason}</td>
-      </tr>
-    `).join('');
-    $('cap-total-km').textContent = `${d.totalKm.toFixed(1)} km`;
-    $('cap-total-sum').textContent = `합산: ${getSumExpression()} = ${d.totalKm.toFixed(1)} km`;
-
-    $('cap-formula').innerHTML = `총 인정거리 = <strong>${d.totalKm.toFixed(1)} km</strong><br>
-사용연료 = ${d.totalKm.toFixed(1)} ÷ ${mileage} = ${fuelUsed.toFixed(2)} L<br>
-연료비 = ${fuelUsed.toFixed(2)} L × ${fmt(fuelPrice)}원 = ${fmt(rawFuelCost)}원<br>
-보정 적용 = ${fmt(rawFuelCost)}원 × ${multiplier} = <strong>${fmt(adjustedFuelCost)}원</strong>`;
-
-    let basisText = '';
-    let dateNote = '';
-    if (fallback) {
-      if (fallbackReason === 'exceeds_7days') {
-        dateNote = ` <span style="color: var(--warning-amber); font-weight: 700;">※ 출장일 7일 경과로 ${tradeDate} 유가 적용 (오피넷 무료 API 7일 제한)</span>`;
-      } else if (fallbackReason === 'future_date') {
-        dateNote = ` <span style="color: var(--warning-amber); font-weight: 700;">※ 출장일 미도래로 ${tradeDate} 유가 적용</span>`;
-      }
-    }
-
-    if (fuelType === 'hybrid') {
-      basisText = `<strong>적용 단가 출처</strong>
-• 연비 ${mileage}km/L: 공무원 여비업무 처리기준 하이브리드 연비 (인사혁신처 예규 「공무원보수 등의 업무지침」)<br>
-• 유가 ${fmt(fuelPrice)}원/L: 한국석유공사 오피넷 휘발유 ${tradeDate} 전국평균 (하이브리드는 휘발유 단가 준용)${dateNote}`;
-    } else if (fuelType === 'premiumGasoline') {
-      basisText = `<strong>적용 단가 출처</strong>
-• 연비 ${mileage}km/L: 공무원 여비업무 처리기준 휘발유 연비 준용 (인사혁신처 예규 「공무원보수 등의 업무지침」, 고급휘발유 별도 기준 부재)<br>
-• 유가 ${fmt(fuelPrice)}원/L: 한국석유공사 오피넷 고급휘발유 ${tradeDate} 전국평균${dateNote}`;
-    } else {
-      basisText = `<strong>적용 단가 출처</strong>
-• 연비 ${mileage}km/L: 공무원 여비업무 처리기준 ${fuelLabel} 연비 (인사혁신처 예규 「공무원보수 등의 업무지침」)<br>
-• 유가 ${fmt(fuelPrice)}원/L: 한국석유공사 오피넷 ${OFFICIAL_FUEL_NAMES[fuelType]} ${tradeDate} 전국평균${dateNote}`;
-    }
-    $('cap-basis').innerHTML = basisText;
-
-    $('cap-fuel').textContent = fmt(adjustedFuelCost) + ' 원';
-    $('cap-toll').textContent = fmt(toll) + ' 원';
-    $('cap-parking').textContent = fmt(parking) + ' 원';
-    $('cap-total').textContent = fmt(totalCost) + ' 원';
-
-    let hasReceipt = false;
-    if (receipts.toll) { $('cap-toll-receipt-img').src = receipts.toll; $('cap-toll-receipt-wrap').style.display = 'block'; $('cap-toll-mark').style.display = 'inline'; hasReceipt = true; }
-    else { $('cap-toll-receipt-wrap').style.display = 'none'; $('cap-toll-mark').style.display = 'none'; }
-    if (receipts.parking) { $('cap-parking-receipt-img').src = receipts.parking; $('cap-parking-receipt-wrap').style.display = 'block'; $('cap-parking-mark').style.display = 'inline'; hasReceipt = true; }
-    else { $('cap-parking-receipt-wrap').style.display = 'none'; $('cap-parking-mark').style.display = 'none'; }
-    $('cap-receipts-section').style.display = hasReceipt ? 'block' : 'none';
-
-    $('step-input').style.display = 'none';
-    $('result-wrap').style.display = 'block';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  function editDraft() {
-    $('result-wrap').style.display = 'none';
-    $('step-input').style.display = 'block';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  // ===== 디바이스 감지 + 다운로드 =====
-  function isMobile() {
-    const ua = navigator.userAgent || '';
-    const mobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
-    const narrowScreen = window.innerWidth < 768;
-    return mobileUA || narrowScreen;
-  }
-
-  function downloadAsPDF() {
-    if (!lastCalc) return;
-    const c = lastCalc;
-    const safeName = (c.applicant || '미입력').replace(/[\/\\?%*:|"<>]/g, '_');
-    const safeDate = (c.tripDate || new Date().toISOString().slice(0,10)).replace(/-/g, '');
-    const originalTitle = document.title;
-    document.title = `출장유류비_${safeName}_${safeDate}`;
-    window.print();
-    setTimeout(() => { document.title = originalTitle; }, 500);
-  }
-
-  async function downloadAsImage() {
-    if (!lastCalc) return;
-    const c = lastCalc;
-    const btn = $('pdf-btn');
-    const orig = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spin"><i class="ti ti-loader-2"></i></span> 이미지 생성 중...';
-
-    try {
-      const captureEl = $('capture-area');
-      const canvas = await html2canvas(captureEl, {
-        scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false,
-        windowWidth: captureEl.scrollWidth, windowHeight: captureEl.scrollHeight
-      });
-
-      const safeName = (c.applicant || '미입력').replace(/[\/\\?%*:|"<>]/g, '_');
-      const safeDate = (c.tripDate || new Date().toISOString().slice(0,10)).replace(/-/g, '');
-      const filename = `출장유류비_${safeName}_${safeDate}.png`;
-
-      canvas.toBlob(function(blob) {
-        if (!blob) { throw new Error('이미지 생성 실패'); }
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        setTimeout(() => URL.revokeObjectURL(url), 100);
-        btn.innerHTML = '<i class="ti ti-check"></i> 저장 완료';
-        setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 1500);
-      }, 'image/png');
-    } catch (e) {
-      console.error('Image generation error:', e);
-      alert('이미지 생성 실패: ' + e.message);
-      btn.innerHTML = orig;
-      btn.disabled = false;
-    }
-  }
-
-  function handleDownload() {
-    if (isMobile()) downloadAsImage();
-    else downloadAsPDF();
-  }
-
-  function updateDownloadButtonLabel() {
-    const label = $('pdf-btn-label');
-    const infoText = $('result-info-text');
-    if (isMobile()) {
-      if (label) label.textContent = '이미지 저장';
-      if (infoText) infoText.innerHTML = '산정서가 생성되었습니다. <strong>이미지 저장</strong> 버튼을 누르면 PNG 파일로 다운로드됩니다.';
-    } else {
-      if (label) label.textContent = 'PDF 저장 / 인쇄';
-      if (infoText) infoText.innerHTML = '산정서가 생성되었습니다. <strong>PDF 저장</strong> 시 인쇄 다이얼로그에서 <strong>"대상: PDF로 저장"</strong>을 선택하세요.';
-    }
-  }
-
-  // ===== 초기화 =====
-  $('add-visit-btn').addEventListener('click', () => { syncVisitsFromInputs(); addVisit(); });
-
-  $('trip-date').addEventListener('change', () => {
-    $('trip-date').classList.remove('err-field');
-    fetchOpinetPricesForTripDate();
+    presetsEl.appendChild(btn);
   });
 
-  ['applicant','department','carnum','fuel-type'].forEach(id => {
-    $(id).addEventListener('change', (e) => {
-      save(id, e.target.value);
-      $(id).classList.remove('err-field');
-      if (id === 'fuel-type') updateFuelInfo();
+  // addr input listener
+  addr.addEventListener('input', e => {
+    renderAutoNotices(autoNoticesEl, e.target.value);
+    presetsEl.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('sel'));
+    setContactBtnsDisabled(contactBtns, false);
+    wp.short = null;
+    if (addr.value.trim()) addr.classList.remove('err-field');
+  });
+
+  // contact input listener (clear error on type)
+  contact.addEventListener('input', () => {
+    if (contact.value.trim()) contact.classList.remove('err-field');
+  });
+
+  // notice cards
+  WAYPOINT_NOTICES.forEach(n => {
+    const nc = document.createElement('div');
+    nc.className = 'notice-card';
+    nc.innerHTML = `<div class="ntitle">${n.title}</div><div class="nbody">${n.body}</div>`;
+    nc.addEventListener('click', () => {
+      if (wp.selectedNotices.has(n.id)) { wp.selectedNotices.delete(n.id); nc.classList.remove('sel'); }
+      else { wp.selectedNotices.add(n.id); nc.classList.add('sel'); }
     });
-    $(id).addEventListener('blur', (e) => save(id, e.target.value));
-    $(id).addEventListener('input', () => $(id).classList.remove('err-field'));
-  });
-  $('purpose').addEventListener('input', () => $('purpose').classList.remove('err-field'));
-
-  $('home-addr-detail').addEventListener('input', (e) => {
-    $('home-addr-2-detail').value = e.target.value;
-    save('home-addr-detail', e.target.value);
-  });
-  $('home-addr-2-detail').addEventListener('input', (e) => {
-    $('home-addr-detail').value = e.target.value;
-    save('home-addr-detail', e.target.value);
+    noticeCardsEl.appendChild(nc);
   });
 
-  setupReceipt('toll');
-  setupReceipt('parking');
+  // quick-time pills
+  quickEl.querySelectorAll('.pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      quickEl.querySelectorAll('.pill').forEach(b => b.classList.remove('sel','err-field'));
+      btn.classList.add('sel');
+      dtFieldsEl.style.display = btn.dataset.mode === 'pick' ? 'block' : 'none';
+      wp.mode = btn.dataset.mode === 'pick' ? null : btn.dataset.mode;
+    });
+  });
 
-  $('auto-calc-btn').addEventListener('click', autoCalcDistance);
-  $('calc-btn').addEventListener('click', calculate);
-  $('edit-btn').addEventListener('click', editDraft);
-  $('pdf-btn').addEventListener('click', handleDownload);
+  // remove button
+  removeBtn.addEventListener('click', () => {
+    if (!confirm('이 경유지를 삭제하시겠습니까? 입력한 정보가 사라집니다.')) return;
+    const idx = waypoints.findIndex(w => w.id === wp.id);
+    if (idx >= 0) waypoints.splice(idx, 1);
+    card.remove();
+    renumberWaypoints();
+  });
 
-  // 회사 지점 드롭다운 채우기
-  function renderOfficeSelect() {
-    const sel = $('office-select');
-    sel.innerHTML = CONFIG.offices.map((o, i) =>
-      `<option value="${i}"${i === selectedOfficeIdx ? ' selected' : ''}>${o.name}</option>`
-    ).join('');
+  return card;
+}
+
+function renumberWaypoints() {
+  waypoints.forEach((wp, i) => {
+    const n = i + 1;
+    wp.refs.numBadge.textContent = n;
+    wp.refs.numText.textContent = n;
+  });
+}
+
+function addWaypoint() {
+  waypointCounter++;
+  const wp = {
+    id: 'w' + waypointCounter,
+    short: null,
+    selectedNotices: new Set(),
+    mode: null,
+  };
+  const card = buildWaypointCard(wp);
+  waypoints.push(wp);
+  document.getElementById('waypoints-area').appendChild(card);
+  renumberWaypoints();
+  // scroll into view so user sees the new card
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // focus first input
+  setTimeout(() => wp.refs.addr.focus({ preventScroll: true }), 350);
+}
+
+document.getElementById('add-waypoint-btn').addEventListener('click', addWaypoint);
+
+function se(id, show) { document.getElementById(id).style.display = show ? 'block' : 'none'; }
+
+function goTo(n) {
+  document.querySelectorAll('.step').forEach((s, i) => s.classList.toggle('active', i === n));
+  for (let i = 0; i <= 3; i++) document.getElementById('d' + i).classList.toggle('done', i <= n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function next(n) {
+  if (n === 0) {
+    state.item = document.getElementById('item').value.trim();
+    state.vehicles = state.vehicles || [];
+    // "직접 입력" 선택 시 입력값으로 치환
+    const otherVal = document.getElementById('vehicle-other').value.trim();
+    state.vehicles = state.vehicles.map(v => v === '직접 입력' ? otherVal : v).filter(Boolean);
+    state.temp = document.getElementById('temp').value.trim();
+    const noItem = !state.item, noVehicle = state.vehicles.length === 0;
+    document.getElementById('item').classList.toggle('err-field', noItem);
+    if (noVehicle) document.getElementById('vehicle-grid').querySelectorAll('.vcard').forEach(v => v.classList.add('err-field'));
+    se('err0-item', noItem); se('err0-vehicle', noVehicle);
+    if (noItem || noVehicle) return;
   }
-  function updateOfficeDisplay() {
-    $('office-addr-display').textContent = getOfficeFullAddr();
+  if (n === 1) {
+    state.fromAddr = document.getElementById('from-addr').value.trim();
+    state.fromContact = document.getElementById('from-contact').value.trim();
+    state.fromMemo = document.getElementById('from-memo').value.trim();
+    const dtOk = state.fromMode === 'immediate' || (document.getElementById('from-date').value && document.getElementById('from-time').value);
+    const noAddr = !state.fromAddr, noContact = !state.fromContact, noDt = !state.fromMode && !dtOk;
+    document.getElementById('from-addr').classList.toggle('err-field', noAddr);
+    document.getElementById('from-contact').classList.toggle('err-field', noContact);
+    if (noDt) document.getElementById('from-quick').querySelectorAll('.pill').forEach(q => q.classList.add('err-field'));
+    else document.getElementById('from-quick').querySelectorAll('.pill').forEach(q => q.classList.remove('err-field'));
+    se('err1-addr', noAddr); se('err1-contact', noContact); se('err1-dt', noDt);
+    if (noAddr || noContact || noDt) return;
+  }
+  goTo(n + 1);
+}
+
+function fmtDate(d) {
+  if (!d) return '';
+  const [y, m, day] = d.split('-');
+  const days = ['일', '월', '화', '수', '목', '금', '토'];
+  const dow = days[new Date(parseInt(y), parseInt(m) - 1, parseInt(day)).getDay()];
+  return y + '년 ' + parseInt(m) + '월 ' + parseInt(day) + '일(' + dow + ')';
+}
+function fmtTime(t) {
+  if (!t) return '';
+  const [h, m] = t.split(':');
+  const hh = parseInt(h);
+  return (hh < 12 ? '오전 ' : '오후 ') + (hh === 0 ? 12 : hh > 12 ? hh - 12 : hh) + (m !== '00' ? ':' + m : '시');
+}
+
+function addrShort(presetShort, addr) {
+  if (presetShort) return presetShort;
+  if (!addr) return '';
+  const parts = addr.trim().split(/\s+/).slice(0, 2);
+  const cleaned = parts.map(p => {
+    const r = p.replace(/(?<=.)(특별시|광역시|특별자치시|특별자치도|시|도|군|구)$/, '');
+    return r.length >= 2 ? r : p;
+  });
+  return cleaned.join('');
+}
+
+function validateWaypoint(wp) {
+  const addrVal = wp.refs.addr.value.trim();
+  const contactVal = wp.refs.contact.value.trim();
+  const dtPicked = wp.refs.dateEl.value && wp.refs.timeEl.value;
+  const dtOk = wp.mode === 'asap' || dtPicked;
+  const noAddr = !addrVal, noContact = !contactVal, noDt = !dtOk;
+  wp.refs.addr.classList.toggle('err-field', noAddr);
+  wp.refs.contact.classList.toggle('err-field', noContact);
+  if (noDt) wp.refs.quickEl.querySelectorAll('.pill').forEach(q => q.classList.add('err-field'));
+  else wp.refs.quickEl.querySelectorAll('.pill').forEach(q => q.classList.remove('err-field'));
+  return !(noAddr || noContact || noDt);
+}
+
+function generate() {
+  // 도착지 validation
+  state.toAddr = document.getElementById('to-addr').value.trim();
+  state.toContact = document.getElementById('to-contact').value.trim();
+  state.toMemo = document.getElementById('to-memo').value.trim();
+  const dtOk = state.toMode === 'asap' || (document.getElementById('to-date').value && document.getElementById('to-time').value);
+  const noAddr = !state.toAddr, noContact = !state.toContact, noDt = !state.toMode && !dtOk;
+  document.getElementById('to-addr').classList.toggle('err-field', noAddr);
+  document.getElementById('to-contact').classList.toggle('err-field', noContact);
+  if (noDt) document.getElementById('to-quick').querySelectorAll('.pill').forEach(q => q.classList.add('err-field'));
+  else document.getElementById('to-quick').querySelectorAll('.pill').forEach(q => q.classList.remove('err-field'));
+  se('err2-addr', noAddr); se('err2-contact', noContact); se('err2-dt', noDt);
+
+  // 경유지 validation
+  let wpInvalid = false;
+  let firstInvalidWp = null;
+  waypoints.forEach(wp => {
+    if (!validateWaypoint(wp)) {
+      wpInvalid = true;
+      if (!firstInvalidWp) firstInvalidWp = wp;
+    }
+  });
+  se('err2-waypoint', wpInvalid);
+
+  if (noAddr || noContact || noDt || wpInvalid) {
+    if (firstInvalidWp) firstInvalidWp.refs.card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
   }
 
-  // 지점 변경 시: 좌표 캐시 초기화 + 거리 재조회 강제
-  $('office-select').addEventListener('change', (e) => {
-    selectedOfficeIdx = parseInt(e.target.value) || 0;
-    officeCoord = null;  // 좌표 다시 계산하도록
-    save('selected-office-idx', selectedOfficeIdx);
-    updateOfficeDisplay();
-    invalidateDistance();
+  const fromDT = state.fromMode === 'immediate' ? '즉시 요청'
+    : [fmtDate(document.getElementById('from-date').value), fmtTime(document.getElementById('from-time').value)].filter(Boolean).join(' ');
+  const toDT = state.toMode === 'asap' ? '최대한 빠르게'
+    : [fmtDate(document.getElementById('to-date').value), fmtTime(document.getElementById('to-time').value)].filter(Boolean).join(' ');
+
+  const autoMatchLines = (addr) =>
+    AUTO_NOTICES.filter(n => addr && addr.includes(n.keyword)).map(n => '  ' + n.body);
+  const fromNoticeLines = [
+    ...FROM_NOTICES.filter(n => selectedFromNotices.has(n.id)).map(n => '  ⚠ ' + n.body),
+    ...autoMatchLines(state.fromAddr)
+  ].join('\n');
+  const toNoticeLines = [
+    ...TO_NOTICES.filter(n => selectedToNotices.has(n.id)).map(n => '  ⚠ ' + n.body),
+    ...autoMatchLines(state.toAddr)
+  ].join('\n');
+
+  const fromShort = addrShort(state.fromShort, state.fromAddr);
+  const toShort = addrShort(state.toShort, state.toAddr);
+  const wpShorts = waypoints.map(wp => addrShort(wp.short, wp.refs.addr.value.trim()));
+  const summary = [fromShort, ...wpShorts, toShort].filter(Boolean).join('→');
+
+  let msg = '🚚' + summary + '\n';
+  msg += '─────────────────\n';
+  msg += '📦 물품: ' + state.item + '\n';
+  msg += '  차량: ' + (state.vehicles && state.vehicles.length ? state.vehicles.join(' / ') : '') + '\n';
+  if (state.temp) msg += '  온도: ' + state.temp + '\n';
+  msg += '─────────────────\n';
+  msg += '📍 출발지 (픽업)\n';
+  msg += '  주소: ' + state.fromAddr + '\n';
+  msg += '  담당자: ' + state.fromContact + '\n';
+  msg += '  출발일시: ' + fromDT + '\n';
+  if (fromNoticeLines) msg += '  특이사항:\n' + fromNoticeLines + '\n';
+  if (state.fromMemo) msg += '  메모: ' + state.fromMemo + '\n';
+
+  // 경유지들
+  waypoints.forEach((wp, i) => {
+    const addrVal = wp.refs.addr.value.trim();
+    const contactVal = wp.refs.contact.value.trim();
+    const memoVal = wp.refs.memoEl.value.trim();
+    const wpDT = wp.mode === 'asap' ? '최대한 빠르게'
+      : [fmtDate(wp.refs.dateEl.value), fmtTime(wp.refs.timeEl.value)].filter(Boolean).join(' ');
+    const noticeLines = [
+      ...WAYPOINT_NOTICES.filter(n => wp.selectedNotices.has(n.id)).map(n => '  ⚠ ' + n.body),
+      ...autoMatchLines(addrVal)
+    ].join('\n');
+    msg += '─────────────────\n';
+    msg += '📍 경유지 ' + (i + 1) + '\n';
+    msg += '  주소: ' + addrVal + '\n';
+    msg += '  담당자: ' + contactVal + '\n';
+    msg += '  경유일시: ' + wpDT + '\n';
+    if (noticeLines) msg += '  특이사항:\n' + noticeLines + '\n';
+    if (memoVal) msg += '  메모: ' + memoVal + '\n';
   });
 
-  $('ver-tag').textContent = CONFIG.version;
-  $('ver-date').textContent = CONFIG.lastUpdated;
-  $('capture-multiplier').textContent = CONFIG.multiplier;
+  msg += '─────────────────\n';
+  msg += '📍 도착지 (배송)\n';
+  msg += '  주소: ' + state.toAddr + '\n';
+  msg += '  수령인: ' + state.toContact + '\n';
+  msg += '  도착일시: ' + toDT + '\n';
+  if (toNoticeLines) msg += '  특이사항:\n' + toNoticeLines + '\n';
+  if (state.toMemo) msg += '  메모: ' + state.toMemo + '\n';
+  msg += '─────────────────\n';
+  msg += '💳 결제: ' + state.pay + '\n';
 
-  $('trip-date').value = new Date().toISOString().slice(0,10);
-  load();
-  renderOfficeSelect();   // load로 복원된 selectedOfficeIdx 반영
-  updateOfficeDisplay();
-  addVisit();
-  updateHomeAddrVisibility();
-  updateDownloadButtonLabel();
-  window.addEventListener('resize', updateDownloadButtonLabel);
-  fetchOpinetPricesForTripDate();
-})();
+  const finalMsg = msg.trim();
+  state.generatedText = finalMsg;
+  state.resultEditedText = null;
+  document.getElementById('result-text').textContent = finalMsg;
+  // reset edit UI
+  exitEditMode();
+  goTo(3);
+}
+
+// ===== Edit mode =====
+function toggleEditMode() {
+  const ta = document.getElementById('result-textarea');
+  const isEditing = ta.style.display !== 'none';
+  if (isEditing) exitEditMode();
+  else enterEditMode();
+}
+
+function updateRevertBtnVisibility() {
+  const ta = document.getElementById('result-textarea');
+  const revertBtn = document.getElementById('revert-btn');
+  const isEditing = ta.style.display !== 'none';
+  const hasEdits = state.resultEditedText !== null;
+  // 편집 중이거나, 수정본이 있을 때 원복 버튼 노출
+  revertBtn.classList.toggle('visible', isEditing || hasEdits);
+}
+
+function enterEditMode() {
+  const pre = document.getElementById('result-text');
+  const ta = document.getElementById('result-textarea');
+  const btn = document.getElementById('edit-toggle');
+  const box = document.getElementById('result-box');
+  const hint = document.getElementById('editing-hint');
+  ta.value = state.resultEditedText !== null ? state.resultEditedText : pre.textContent;
+  pre.style.display = 'none';
+  ta.style.display = 'block';
+  ta.style.height = 'auto';
+  ta.style.height = Math.max(280, ta.scrollHeight) + 'px';
+  ta.oninput = () => {
+    ta.style.height = 'auto';
+    ta.style.height = Math.max(280, ta.scrollHeight) + 'px';
+    state.resultEditedText = ta.value;
+    document.getElementById('result-text').textContent = ta.value;
+    updateRevertBtnVisibility();
+  };
+  box.classList.add('editing');
+  hint.classList.add('visible');
+  btn.classList.add('editing');
+  btn.textContent = '✓ 수정 완료';
+  updateRevertBtnVisibility();
+  ta.focus();
+}
+
+function exitEditMode() {
+  const pre = document.getElementById('result-text');
+  const ta = document.getElementById('result-textarea');
+  const btn = document.getElementById('edit-toggle');
+  const box = document.getElementById('result-box');
+  const hint = document.getElementById('editing-hint');
+  if (ta.style.display !== 'none' && state.resultEditedText !== null) {
+    pre.textContent = state.resultEditedText;
+  }
+  pre.style.display = 'block';
+  ta.style.display = 'none';
+  box.classList.remove('editing');
+  hint.classList.remove('visible');
+  btn.classList.remove('editing');
+  btn.textContent = state.resultEditedText !== null ? '✎ 다시 수정' : '✎ 직접 수정';
+  updateRevertBtnVisibility();
+}
+
+function revertToOriginal() {
+  if (state.resultEditedText === null) return; // 변경사항 없음
+  if (!confirm('원본 메시지로 되돌리시겠습니까? 수정한 내용이 사라집니다.')) return;
+  const ta = document.getElementById('result-textarea');
+  const pre = document.getElementById('result-text');
+  state.resultEditedText = null;
+  pre.textContent = state.generatedText;
+  // 편집 중이었다면 textarea도 동기화
+  if (ta.style.display !== 'none') {
+    ta.value = state.generatedText;
+    ta.style.height = 'auto';
+    ta.style.height = Math.max(280, ta.scrollHeight) + 'px';
+  }
+  // 편집 모드 유지 상태일 때는 버튼 라벨만 갱신, 아니면 라벨도 "직접 수정"으로
+  const btn = document.getElementById('edit-toggle');
+  if (ta.style.display === 'none') {
+    btn.textContent = '✎ 직접 수정';
+  }
+  updateRevertBtnVisibility();
+}
+
+document.getElementById('edit-toggle').addEventListener('click', toggleEditMode);
+document.getElementById('revert-btn').addEventListener('click', revertToOriginal);
+
+function copyMsg() {
+  const btn = document.getElementById('copy-btn');
+  const ta = document.getElementById('result-textarea');
+  let text;
+  if (ta.style.display !== 'none') {
+    text = ta.value;
+    state.resultEditedText = text;
+    document.getElementById('result-text').textContent = text;
+  } else {
+    text = document.getElementById('result-text').textContent;
+  }
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ 복사 완료!';
+    btn.classList.add('done');
+    setTimeout(() => { btn.textContent = '복사하기'; btn.classList.remove('done'); }, 2000);
+  });
+}
 </script>
-
 </body>
 </html>
