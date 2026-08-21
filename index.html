@@ -148,6 +148,23 @@ h1 {
 .vcard.sel .vname { color: var(--sans-mint); }
 .vcard.sel .vdesc { color: var(--sans-mint); opacity: 0.7; }
 
+/* Vehicle count */
+#vehicle-count-wrap { margin-bottom: 1.25rem; }
+#vehicle-count-wrap > label { display: block; font-size: 12px; font-weight: 700; color: var(--gray-700); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+.count-mode-toggle { display: flex; gap: 6px; margin-bottom: 10px; }
+.count-mode-btn { flex: 1; padding: 9px 12px; border: 1px solid var(--gray-300); background: var(--sans-white); border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--gray-700); transition: background 0.15s var(--ease-quiet), color 0.15s var(--ease-quiet); font-family: inherit; }
+.count-mode-btn:hover { background: var(--gray-100); }
+.count-mode-btn.sel { background: var(--sans-black); color: var(--sans-mint); border-color: var(--sans-black); font-weight: 700; }
+.count-picker { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.count-btn { padding: 8px 14px; border: 1px solid var(--gray-300); background: var(--sans-white); border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--gray-700); transition: background 0.15s var(--ease-quiet), color 0.15s var(--ease-quiet); font-family: inherit; min-width: 48px; }
+.count-btn:hover { background: var(--gray-100); }
+.count-btn.sel { background: var(--sans-black); color: var(--sans-mint); border-color: var(--sans-black); font-weight: 700; }
+.count-custom { padding: 8px 10px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 13px; width: 80px; font-family: inherit; text-align: center; }
+.count-each-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--gray-100); border-radius: 4px; margin-bottom: 6px; }
+.count-each-row .cname { flex: 1; font-size: 13px; font-weight: 600; color: var(--sans-black); }
+.count-each-row input { width: 70px; padding: 6px 10px; border: 1px solid var(--gray-300); border-radius: 4px; text-align: center; font-size: 13px; font-family: inherit; background: var(--sans-white); }
+.count-each-row .csuffix { font-size: 12px; color: var(--gray-700); font-weight: 500; }
+
 /* Preset list */
 .preset-grid { display: flex; flex-direction: column; gap: 4px; margin-bottom: 1.25rem; }
 .preset-btn {
@@ -617,12 +634,23 @@ h1 {
       <div class="vcard" data-val="오토바이"><div class="vname">오토바이</div><div class="vdesc">초소형 / 퀵</div></div>
       <div class="vcard" data-val="다마스"><div class="vname">다마스</div><div class="vdesc">소형 / 도심</div></div>
       <div class="vcard" data-val="라보"><div class="vname">라보</div><div class="vdesc">소형 / 개방형</div></div>
-      <div class="vcard" data-val="1톤 탑차/윙바디"><div class="vname">1톤 탑차/윙바디</div><div class="vdesc">밀폐형</div></div>
+      <div class="vcard" data-val="1톤 탑차(윙바디)"><div class="vname">1톤 탑차(윙바디)</div><div class="vdesc">밀폐형</div></div>
       <div class="vcard" data-val="1톤 오픈형"><div class="vname">1톤 오픈형</div><div class="vdesc">개방형 화물</div></div>
-      <div class="vcard" data-val="1톤 냉장/냉동"><div class="vname">1톤 냉장/냉동</div><div class="vdesc">저온 식품</div></div>
+      <div class="vcard" data-val="1톤 냉장(냉동)"><div class="vname">1톤 냉장(냉동)</div><div class="vdesc">저온 식품</div></div>
       <div class="vcard" data-val="2.5톤"><div class="vname">2.5톤</div><div class="vdesc">중형 화물</div></div>
       <div class="vcard" data-val="5톤"><div class="vname">5톤</div><div class="vdesc">대형 화물</div></div>
       <div class="vcard" data-val="직접 입력"><div class="vname">기타</div><div class="vdesc">직접 입력</div></div>
+    </div>
+    <div id="vehicle-count-wrap" style="display:none;">
+      <label>차량 대수</label>
+      <div id="count-mode-toggle" class="count-mode-toggle" style="display:none;">
+        <button type="button" class="count-mode-btn sel" data-mode="any">이 중에 1대</button>
+        <button type="button" class="count-mode-btn" data-mode="each">각각 지정</button>
+      </div>
+      <div id="count-single" style="display:none;">
+        <div class="count-picker" id="count-single-btns"></div>
+      </div>
+      <div id="count-each" style="display:none;"></div>
     </div>
     <div class="field" id="vehicle-other-wrap" style="display:none;">
       <label>차량 직접 입력</label>
@@ -1068,8 +1096,124 @@ document.getElementById('vehicle-grid').querySelectorAll('.vcard').forEach(c => 
     // 냉장/냉동 온도 입력란 표시 여부 (선택된 것 중 하나라도 '냉장' 포함 시)
     document.getElementById('temp-wrap').style.display = selected.some(v => v.includes('냉장')) ? 'block' : 'none';
     document.getElementById('err0-vehicle').style.display = 'none';
+    refreshVehicleCountUI();
   });
 });
+
+// ===== Vehicle count =====
+state.vehicleCountMode = 'any';    // 2+대 선택시: 'any' | 'each'
+state.vehicleCountSingle = 1;      // 1종 선택시
+state.vehicleCountsEach = {};      // 각각 지정 모드
+
+const SINGLE_COUNT_OPTS = [1, 2, 3, 4, 5];
+const singleBtnsEl = document.getElementById('count-single-btns');
+SINGLE_COUNT_OPTS.forEach(n => {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'count-btn' + (n === 1 ? ' sel' : '');
+  b.dataset.count = n;
+  b.textContent = n + '대';
+  b.addEventListener('click', () => {
+    singleBtnsEl.querySelectorAll('.count-btn').forEach(x => x.classList.remove('sel'));
+    b.classList.add('sel');
+    state.vehicleCountSingle = n;
+    document.getElementById('count-custom-input').value = '';
+  });
+  singleBtnsEl.appendChild(b);
+});
+const customInput = document.createElement('input');
+customInput.type = 'number';
+customInput.min = 1;
+customInput.className = 'count-custom';
+customInput.id = 'count-custom-input';
+customInput.placeholder = '직접';
+customInput.addEventListener('input', () => {
+  const v = parseInt(customInput.value);
+  if (v >= 1) {
+    singleBtnsEl.querySelectorAll('.count-btn').forEach(x => x.classList.remove('sel'));
+    state.vehicleCountSingle = v;
+  }
+});
+singleBtnsEl.appendChild(customInput);
+
+document.querySelectorAll('#count-mode-toggle .count-mode-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#count-mode-toggle .count-mode-btn').forEach(x => x.classList.remove('sel'));
+    b.classList.add('sel');
+    state.vehicleCountMode = b.dataset.mode;
+    refreshVehicleCountUI();
+  });
+});
+
+function refreshVehicleCountUI() {
+  const selected = state.vehicles || [];
+  const wrap = document.getElementById('vehicle-count-wrap');
+  const modeToggle = document.getElementById('count-mode-toggle');
+  const singleWrap = document.getElementById('count-single');
+  const eachWrap = document.getElementById('count-each');
+
+  // 선택 해제된 차량의 각각 카운트 정리
+  Object.keys(state.vehicleCountsEach).forEach(k => {
+    if (!selected.includes(k)) delete state.vehicleCountsEach[k];
+  });
+
+  if (selected.length === 0) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+
+  if (selected.length === 1) {
+    modeToggle.style.display = 'none';
+    singleWrap.style.display = 'block';
+    eachWrap.style.display = 'none';
+  } else {
+    modeToggle.style.display = 'flex';
+    singleWrap.style.display = 'none';
+    if (state.vehicleCountMode === 'each') {
+      eachWrap.style.display = 'block';
+      renderEachRows(selected);
+    } else {
+      eachWrap.style.display = 'none';
+    }
+  }
+}
+
+function renderEachRows(selected) {
+  const eachWrap = document.getElementById('count-each');
+  eachWrap.innerHTML = '';
+  selected.forEach(v => {
+    if (!state.vehicleCountsEach[v]) state.vehicleCountsEach[v] = 1;
+    const row = document.createElement('div');
+    row.className = 'count-each-row';
+    const name = document.createElement('div');
+    name.className = 'cname';
+    name.textContent = v === '직접 입력' ? '기타 (직접 입력)' : v;
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.min = 1;
+    input.value = state.vehicleCountsEach[v];
+    input.addEventListener('input', () => {
+      const n = parseInt(input.value) || 1;
+      state.vehicleCountsEach[v] = n;
+    });
+    const suffix = document.createElement('div');
+    suffix.className = 'csuffix';
+    suffix.textContent = '대';
+    row.append(name, input, suffix);
+    eachWrap.appendChild(row);
+  });
+}
+
+function buildVehicleLine() {
+  const vs = state.vehicles || [];
+  if (vs.length === 0) return '';
+  if (vs.length === 1) {
+    const n = state.vehicleCountSingle || 1;
+    return vs[0] + ' ' + n + '대';
+  }
+  if (state.vehicleCountMode === 'any') {
+    return vs.join(' / ') + ' 중 1대';
+  }
+  return vs.map(v => v + ' ' + (state.vehicleCountsEach[v] || 1) + '대').join(' / ');
+}
 
 // ===== Waypoint card builder =====
 function buildWaypointCard(wp) {
@@ -1282,6 +1426,11 @@ function next(n) {
     state.vehicles = state.vehicles || [];
     // "직접 입력" 선택 시 입력값으로 치환
     const otherVal = document.getElementById('vehicle-other').value.trim();
+    // "직접 입력" → 실제 차량명으로 치환 (each 카운트 키도 이관)
+    if (otherVal && state.vehicleCountsEach['직접 입력'] != null) {
+      state.vehicleCountsEach[otherVal] = state.vehicleCountsEach['직접 입력'];
+      delete state.vehicleCountsEach['직접 입력'];
+    }
     state.vehicles = state.vehicles.map(v => v === '직접 입력' ? otherVal : v).filter(Boolean);
     state.temp = document.getElementById('temp').value.trim();
     const noItem = !state.item, noVehicle = state.vehicles.length === 0;
@@ -1397,7 +1546,7 @@ function generate() {
   let msg = '🚚' + summary + '\n';
   msg += '─────────────────\n';
   msg += '📦 물품: ' + state.item + '\n';
-  msg += '  차량: ' + (state.vehicles && state.vehicles.length ? state.vehicles.join(' / ') : '') + '\n';
+  msg += '  차량: ' + buildVehicleLine() + '\n';
   if (state.temp) msg += '  온도: ' + state.temp + '\n';
   msg += '─────────────────\n';
   msg += '📍 출발지 (픽업)\n';
