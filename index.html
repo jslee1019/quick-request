@@ -595,7 +595,7 @@ h1 {
 <div class="wrap">
   <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:1.75rem;">
     <h1 style="margin-bottom:0;">🚚 퀵 배송 요청</h1>
-    <span style="font-size:10px; color:var(--gray-500); letter-spacing:0.08em; font-weight:600;">v2026.08.03</span>
+    <span style="font-size:10px; color:var(--gray-500); letter-spacing:0.08em; font-weight:600;">v2026.08.21</span>
   </div>
   <div class="progress">
     <div class="dot done" id="d0"></div>
@@ -783,6 +783,8 @@ const SAMSUNG_KEYWORD = '삼성전자로';
 const SAMSUNG_NOTICE = '네이버 지도/카카오맵: "폴 바셋 삼성 DSR 점" 검색해서 와주세요.';
 const GASAN_KEYWORD = '가산디지털2로 135';
 const GASAN_NOTICE = '지하주차장 층고 2.7M로 높이제한';
+const HYUNDAI_KEYWORD = '헌릉로 12';
+const HYUNDAI_NOTICE = '건물 바깥에 바로 택배랑 퀵 받는 사무실이 위치해있으며 해당 위치에서 담당자에게 전화';
 
 // 자동감지 노티스 목록 — 새로 추가하려면 이 배열에 항목만 추가하면 됩니다.
 const AUTO_NOTICES = [
@@ -790,6 +792,7 @@ const AUTO_NOTICES = [
   { id: 'shinsegae', keyword: SHINSEGAE_KEYWORD, label: '신세계 강남',           body: SHINSEGAE_NOTICE },
   { id: 'samsung',   keyword: SAMSUNG_KEYWORD,   label: '삼성DSR',         body: SAMSUNG_NOTICE },
   { id: 'gasan',     keyword: GASAN_KEYWORD,     label: '가산창고',              body: GASAN_NOTICE },
+  { id: 'hyundai',   keyword: HYUNDAI_KEYWORD,   label: '양재 현대자동차',       body: HYUNDAI_NOTICE },
 ];
 const PRESETS = [
   { name: '모두먼트', short: '모두먼트', addr: '경기 이천시 마장면 프리미엄아울렛로 33-48 A동 2층 모두먼트', contact: '배준혁 010-5582-2921' },
@@ -801,6 +804,7 @@ const PRESETS = [
   { name: '본사', short: '본사', addr: '서울 중구 청계천로 100 시그니처타워 서관 1040호', contact: '' },
   { name: '산스안산공장', short: '안산공장', addr: '경기 안산시 단원구 별망로 35 WAKE B동 산스파운드리', contact: '' },
   { name: '삼성DSR', short: '삼성수원', addr: '경기도 화성시 병점구 삼성전자로 1-1 삼성전자 DSR A타워 정문 "폴 바셋 삼성 DSR 점"', contact: '' },
+  { name: '양재 현대차', short: '양재현대', addr: '서울특별시 서초구 헌릉로 12 현대자동차 양재사옥 서관 B1F 샵앳피소드', contact: '' },
 ];
 const FROM_NOTICES = [
   { id: 'fn_carry', title: '출발지 주소까지 오셔서 직접 운반 필요', body: '출발지 주소까지 오셔서 직접 픽업하여 가져가셔야 합니다.' },
@@ -818,8 +822,10 @@ const CONTACTS = [
   { name: '김경훈', tel: '010-8261-3027' },
   { name: '김도연', tel: '010-2012-0826' },
   { name: '김도형', tel: '010-9449-9715' },
+  { name: '김동은', tel: '010-7204-2036' },
   { name: '김은비', tel: '010-8581-7548' },
   { name: '김태린', tel: '010-2707-2327' },
+  { name: '박선재', tel: '010-3775-7451' },
   { name: '백수진', tel: '010-3143-1677' },
   { name: '이나겸', tel: '010-7216-9274' },
   { name: '이재강', tel: '010-6366-0061' },
@@ -827,6 +833,7 @@ const CONTACTS = [
   { name: '이혜빈', tel: '010-3520-9405' },
   { name: '유동욱', tel: '010-4766-9103' },
   { name: '정다솜', tel: '010-2317-7231' },
+  { name: '정연재', tel: '010-7604-6206' },
   { name: '홍성훈', tel: '010-7123-0261' },
   { name: '홍윤의', tel: '010-8765-2296' },
 ];
