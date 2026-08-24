@@ -567,9 +567,30 @@ h1 {
 .waypoint-card .preset-addr { max-width: 280px; }
 .waypoint-card .preset-btn { background: var(--sans-white); }
 .waypoint-card .preset-btn:hover { background: var(--gray-200); }
+.waypoint-card .preset-btn.sel { background: var(--sans-black); }
+.waypoint-card .preset-btn.sel:hover { background: var(--sans-black); }
 .waypoint-card .notice-card { background: var(--sans-white); }
 .waypoint-card .notice-card:hover { background: var(--gray-200); }
 .waypoint-card .field input, .waypoint-card .field select { background: var(--sans-white); }
+
+/* Waypoint type picker */
+.wp-type-picker { padding: 0.25rem 0 0.5rem; }
+.wp-type-label { font-size: 10px; font-weight: 700; color: var(--gray-500); margin-bottom: 8px; letter-spacing: 0.12em; text-transform: uppercase; }
+.wp-type-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.wp-type-btn { padding: 16px 12px; border: 1px solid var(--gray-300); background: var(--sans-white); border-radius: 4px; cursor: pointer; font-family: inherit; text-align: center; transition: background 0.15s var(--ease-quiet), border-color 0.15s var(--ease-quiet); }
+.wp-type-btn:hover { background: var(--gray-100); }
+.wp-type-btn.sel { background: var(--sans-black); border-color: var(--sans-black); }
+.wp-type-icon { font-size: 18px; font-weight: 700; color: var(--gray-500); margin-bottom: 4px; line-height: 1; }
+.wp-type-btn.sel .wp-type-icon { color: var(--sans-mint); }
+.wp-type-name { font-size: 13px; font-weight: 700; color: var(--sans-black); letter-spacing: -0.01em; }
+.wp-type-btn.sel .wp-type-name { color: var(--sans-mint); }
+.wp-type-desc { font-size: 10px; color: var(--gray-500); margin-top: 4px; letter-spacing: 0.02em; }
+.wp-type-btn.sel .wp-type-desc { color: var(--sans-mint); opacity: 0.7; }
+.wp-type-btn.err-field { background: var(--error-red-tint); box-shadow: inset 0 0 0 1px var(--error-red); }
+/* Type badge in header */
+.wp-type-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: var(--sans-black); color: var(--sans-mint); letter-spacing: 0.06em; display: none; }
+.wp-type-badge.pickup { background: var(--sans-black); color: var(--sans-mint); }
+.wp-type-badge.dropoff { background: var(--sans-mint); color: var(--sans-black); }
 
 /* Add waypoint button */
 .add-waypoint-btn {
@@ -612,7 +633,7 @@ h1 {
 <div class="wrap">
   <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:1.75rem;">
     <h1 style="margin-bottom:0;">🚚 퀵 배송 요청</h1>
-    <span style="font-size:10px; color:var(--gray-500); letter-spacing:0.08em; font-weight:600;">v2026.08.21</span>
+    <span style="font-size:10px; color:var(--gray-500); letter-spacing:0.08em; font-weight:600;">v2026.08.24</span>
   </div>
   <div class="progress">
     <div class="dot done" id="d0"></div>
@@ -773,7 +794,7 @@ h1 {
     <div class="err-msg" id="err2-addr">배송 주소를 입력해주세요.</div>
     <div class="err-msg" id="err2-contact">수령인/연락처를 입력해주세요.</div>
     <div class="err-msg" id="err2-dt">도착 희망 일시를 선택해주세요.</div>
-    <div class="err-msg" id="err2-waypoint">경유지 정보를 모두 입력해주세요.</div>
+    <div class="err-msg" id="err2-waypoint">경유지 유형 및 정보를 모두 입력해주세요.</div>
     <div class="btn-row">
       <button class="btn" onclick="goTo(1)">이전</button>
       <button class="btn primary" onclick="generate()">메시지 만들기</button>
@@ -1226,45 +1247,71 @@ function buildWaypointCard(wp) {
       <div class="wp-title">
         <span class="wp-num-badge" data-role="num"></span>
         <span>경유지 <span data-role="num-text"></span></span>
+        <span class="wp-type-badge" data-role="type-badge"></span>
       </div>
       <button class="wp-remove-btn" data-action="remove">삭제</button>
     </div>
 
-    <div class="wp-sub-divider">자주 쓰는 주소</div>
-    <div class="preset-grid" data-role="presets"></div>
+    <div class="wp-type-picker" data-role="type-picker">
+      <div class="wp-type-label">경유지 유형 <span style="color:var(--error-red);">*</span></div>
+      <div class="wp-type-btns">
+        <button type="button" class="wp-type-btn" data-type="pickup">
+          <div class="wp-type-icon">＋</div>
+          <div class="wp-type-name">추가 픽업</div>
+          <div class="wp-type-desc">이곳에서 물건 실음</div>
+        </button>
+        <button type="button" class="wp-type-btn" data-type="dropoff">
+          <div class="wp-type-icon">－</div>
+          <div class="wp-type-name">부분 하차</div>
+          <div class="wp-type-desc">이곳에 물건 내림</div>
+        </button>
+      </div>
+    </div>
 
-    <div class="field">
-      <label>경유지 주소<span class="req">*</span></label>
-      <input type="text" data-role="addr" placeholder="주소를 직접 입력하거나 위에서 선택하세요">
-    </div>
-    <div class="field">
-      <label>담당자 / 연락처<span class="req">*</span></label>
-      <input type="text" data-role="contact" placeholder="예) 홍길동 010-0000-0000">
-      <div class="contact-btns" data-role="contact-btns" style="margin-top:8px; margin-bottom:0;"></div>
-    </div>
-    <div class="datetime-wrap">
-      <label>경유 희망 일시<span class="req" style="color:var(--error-red);">*</span></label>
-      <div class="pill-group" data-role="quick">
-        <div class="pill" data-mode="asap">최대한 빠르게</div>
-        <div class="pill" data-mode="pick">날짜/시간 선택</div>
+    <div data-role="wp-form" style="display:none;">
+      <div class="field" data-role="wp-item-field">
+        <label>
+          <span data-role="wp-item-label">픽업/하차 물품</span>
+          <span class="tag-opt">선택</span>
+        </label>
+        <input type="text" data-role="wp-item" placeholder="이 경유지에서 처리할 물품">
       </div>
-      <div data-role="dt-fields" style="display:none;">
-        <div class="date-quick">
-          <button type="button" class="date-quick-btn" data-day="0">오늘</button>
-          <button type="button" class="date-quick-btn" data-day="1">내일</button>
+      <div class="wp-sub-divider">자주 쓰는 주소</div>
+      <div class="preset-grid" data-role="presets"></div>
+
+      <div class="field">
+        <label>경유지 주소<span class="req">*</span></label>
+        <input type="text" data-role="addr" placeholder="주소를 직접 입력하거나 위에서 선택하세요">
+      </div>
+      <div class="field">
+        <label>담당자 / 연락처<span class="req">*</span></label>
+        <input type="text" data-role="contact" placeholder="예) 홍길동 010-0000-0000">
+        <div class="contact-btns" data-role="contact-btns" style="margin-top:8px; margin-bottom:0;"></div>
+      </div>
+      <div class="datetime-wrap">
+        <label>경유 희망 일시<span class="req" style="color:var(--error-red);">*</span></label>
+        <div class="pill-group" data-role="quick">
+          <div class="pill" data-mode="asap">최대한 빠르게</div>
+          <div class="pill" data-mode="pick">날짜/시간 선택</div>
         </div>
-        <div class="dt-row">
-          <div class="field" style="margin-bottom:0;"><input type="date" data-role="date"></div>
-          <div class="field" style="margin-bottom:0;"><select data-role="time"></select></div>
+        <div data-role="dt-fields" style="display:none;">
+          <div class="date-quick">
+            <button type="button" class="date-quick-btn" data-day="0">오늘</button>
+            <button type="button" class="date-quick-btn" data-day="1">내일</button>
+          </div>
+          <div class="dt-row">
+            <div class="field" style="margin-bottom:0;"><input type="date" data-role="date"></div>
+            <div class="field" style="margin-bottom:0;"><select data-role="time"></select></div>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="wp-sub-divider">경유지 특이사항</div>
-    <div data-role="auto-notices"></div>
-    <div class="notice-cards" data-role="notice-cards"></div>
-    <div class="field">
-      <label>경유 메모<span class="tag-opt">선택</span></label>
-      <input type="text" data-role="memo" placeholder="예) 1층 물류창고 앞, 사전 연락 필요">
+      <div class="wp-sub-divider">경유지 특이사항</div>
+      <div data-role="auto-notices"></div>
+      <div class="notice-cards" data-role="notice-cards"></div>
+      <div class="field">
+        <label>경유 메모<span class="tag-opt">선택</span></label>
+        <input type="text" data-role="memo" placeholder="예) 1층 물류창고 앞, 사전 연락 필요">
+      </div>
     </div>
   `;
 
@@ -1280,8 +1327,35 @@ function buildWaypointCard(wp) {
   const timeEl = card.querySelector('[data-role="time"]');
   const memoEl = card.querySelector('[data-role="memo"]');
   const removeBtn = card.querySelector('[data-action="remove"]');
+  const typePickerEl = card.querySelector('[data-role="type-picker"]');
+  const typeBtns = typePickerEl.querySelectorAll('.wp-type-btn');
+  const wpFormEl = card.querySelector('[data-role="wp-form"]');
+  const typeBadgeEl = card.querySelector('[data-role="type-badge"]');
+  const wpItemEl = card.querySelector('[data-role="wp-item"]');
+  const wpItemLabelEl = card.querySelector('[data-role="wp-item-label"]');
 
-  wp.refs = { card, addr, contact, dateEl, timeEl, memoEl, quickEl, autoNoticesEl, presetsEl, contactBtns, numBadge: card.querySelector('[data-role="num"]'), numText: card.querySelector('[data-role="num-text"]') };
+  wp.refs = { card, addr, contact, dateEl, timeEl, memoEl, quickEl, autoNoticesEl, presetsEl, contactBtns, typePickerEl, typeBtns, wpFormEl, typeBadgeEl, wpItemEl, wpItemLabelEl, numBadge: card.querySelector('[data-role="num"]'), numText: card.querySelector('[data-role="num-text"]') };
+
+  // 유형 선택
+  typeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      typeBtns.forEach(x => x.classList.remove('sel', 'err-field'));
+      btn.classList.add('sel');
+      wp.type = btn.dataset.type;
+      wpFormEl.style.display = 'block';
+      applyWpTypeBadge(wp);
+      // 유형별 물품 라벨/플레이스홀더 갱신
+      if (wp.type === 'pickup') {
+        wpItemLabelEl.textContent = '추가 픽업 물품';
+        wpItemEl.placeholder = '예) 원두 10kg, 매장 부자재';
+      } else {
+        wpItemLabelEl.textContent = '부분 하차 물품';
+        wpItemEl.placeholder = '예) 산스 블렌드.Z 20박스';
+      }
+      // 유형 선택 후 물품 필드로 자연스럽게 유도
+      setTimeout(() => wpItemEl.focus({ preventScroll: true }), 100);
+    });
+  });
 
   // contact buttons
   CONTACTS.forEach(c => {
@@ -1384,6 +1458,22 @@ function buildWaypointCard(wp) {
   return card;
 }
 
+function applyWpTypeBadge(wp) {
+  const el = wp.refs.typeBadgeEl;
+  if (!el) return;
+  if (wp.type === 'pickup') {
+    el.textContent = '추가 픽업';
+    el.className = 'wp-type-badge pickup';
+    el.style.display = 'inline-flex';
+  } else if (wp.type === 'dropoff') {
+    el.textContent = '부분 하차';
+    el.className = 'wp-type-badge dropoff';
+    el.style.display = 'inline-flex';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
 function renumberWaypoints() {
   waypoints.forEach((wp, i) => {
     const n = i + 1;
@@ -1399,15 +1489,14 @@ function addWaypoint() {
     short: null,
     selectedNotices: new Set(),
     mode: null,
+    type: null,  // 'pickup' | 'dropoff'
   };
   const card = buildWaypointCard(wp);
   waypoints.push(wp);
   document.getElementById('waypoints-area').appendChild(card);
   renumberWaypoints();
-  // scroll into view so user sees the new card
+  // scroll into view so user sees the new card (and the type picker at top)
   card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  // focus first input
-  setTimeout(() => wp.refs.addr.focus({ preventScroll: true }), 350);
 }
 
 document.getElementById('add-waypoint-btn').addEventListener('click', addWaypoint);
@@ -1485,12 +1574,15 @@ function validateWaypoint(wp) {
   const contactVal = wp.refs.contact.value.trim();
   const dtPicked = wp.refs.dateEl.value && wp.refs.timeEl.value;
   const dtOk = wp.mode === 'asap' || dtPicked;
+  const noType = !wp.type;
   const noAddr = !addrVal, noContact = !contactVal, noDt = !dtOk;
+  if (noType) wp.refs.typeBtns.forEach(b => b.classList.add('err-field'));
+  else wp.refs.typeBtns.forEach(b => b.classList.remove('err-field'));
   wp.refs.addr.classList.toggle('err-field', noAddr);
   wp.refs.contact.classList.toggle('err-field', noContact);
   if (noDt) wp.refs.quickEl.querySelectorAll('.pill').forEach(q => q.classList.add('err-field'));
   else wp.refs.quickEl.querySelectorAll('.pill').forEach(q => q.classList.remove('err-field'));
-  return !(noAddr || noContact || noDt);
+  return !(noType || noAddr || noContact || noDt);
 }
 
 function generate() {
@@ -1568,7 +1660,13 @@ function generate() {
       ...autoMatchLines(addrVal)
     ].join('\n');
     msg += '─────────────────\n';
-    msg += '📍 경유지 ' + (i + 1) + '\n';
+    const typeLabel = wp.type === 'pickup' ? ' (추가 픽업)' : wp.type === 'dropoff' ? ' (부분 하차)' : '';
+    msg += '📍 경유지 ' + (i + 1) + typeLabel + '\n';
+    const wpItemVal = wp.refs.wpItemEl.value.trim();
+    if (wpItemVal) {
+      const itemLabel = wp.type === 'pickup' ? '픽업 물품' : wp.type === 'dropoff' ? '하차 물품' : '물품';
+      msg += '  ' + itemLabel + ': ' + wpItemVal + '\n';
+    }
     msg += '  주소: ' + addrVal + '\n';
     msg += '  담당자: ' + contactVal + '\n';
     msg += '  경유일시: ' + wpDT + '\n';
