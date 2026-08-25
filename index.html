@@ -108,6 +108,7 @@ h1 {
 }
 .field input::placeholder { color: var(--gray-500); }
 .field input.err-field { border-color: var(--error-red); background: var(--error-red-tint); }
+.field select.err-field { border-color: var(--error-red); background: var(--error-red-tint); }
 .field input:focus, .field select:focus, .field textarea:focus {
   outline: none;
   border-color: var(--sans-black);
@@ -230,7 +231,7 @@ h1 {
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
-.dt-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dt-row { display: grid; grid-template-columns: 1.4fr 0.7fr 1fr; gap: 6px; }
 
 /* Today / Tomorrow quick buttons (above date field) */
 .date-quick { display: flex; gap: 6px; margin-bottom: 8px; }
@@ -633,7 +634,7 @@ h1 {
 <div class="wrap">
   <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:1.75rem;">
     <h1 style="margin-bottom:0;">🚚 퀵 배송 요청</h1>
-    <span style="font-size:10px; color:var(--gray-500); letter-spacing:0.08em; font-weight:600;">v2026.08.24</span>
+    <span style="font-size:10px; color:var(--gray-500); letter-spacing:0.08em; font-weight:600;">v2026.08.25</span>
   </div>
   <div class="progress">
     <div class="dot done" id="d0"></div>
@@ -716,6 +717,7 @@ h1 {
         </div>
         <div class="dt-row">
           <div class="field" style="margin-bottom:0;"><input type="date" id="from-date"></div>
+          <div class="field" style="margin-bottom:0;"><select id="from-ampm"></select></div>
           <div class="field" style="margin-bottom:0;"><select id="from-time"></select></div>
         </div>
       </div>
@@ -774,6 +776,7 @@ h1 {
         </div>
         <div class="dt-row">
           <div class="field" style="margin-bottom:0;"><input type="date" id="to-date"></div>
+          <div class="field" style="margin-bottom:0;"><select id="to-ampm"></select></div>
           <div class="field" style="margin-bottom:0;"><select id="to-time"></select></div>
         </div>
       </div>
@@ -829,7 +832,6 @@ const SANS_NOTICE = '오시는 길: 낙원상가에서 나오시다가 좌측에
 const SHINSEGAE_KEYWORD = '신반포로 176';
 const SHINSEGAE_NOTICE = '매장 안쪽까지 이동 거리가 있습니다. 끌 차(핸드트럭) 필수 지참 부탁드리며, 물건을 끝까지 성실하게 운반해주실 기사님을 요청드립니다.';
 const SAMSUNG_KEYWORD = '삼성전자로';
-const SAMSUNG_NOTICE = '네이버 지도/카카오맵: "폴 바셋 삼성 DSR 점" 검색해서 와주세요.';
 const GASAN_KEYWORD = '가산디지털2로 135';
 const GASAN_NOTICE = '지하주차장 층고 2.7M로 높이제한';
 const HYUNDAI_KEYWORD = '헌릉로 12';
@@ -839,7 +841,6 @@ const HYUNDAI_NOTICE = '건물 바깥에 바로 택배랑 퀵 받는 사무실�
 const AUTO_NOTICES = [
   { id: 'sans',      keyword: SANS_KEYWORD,      label: '산스 (수표로28길 30)', body: SANS_NOTICE },
   { id: 'shinsegae', keyword: SHINSEGAE_KEYWORD, label: '신세계 강남',           body: SHINSEGAE_NOTICE },
-  { id: 'samsung',   keyword: SAMSUNG_KEYWORD,   label: '삼성DSR',         body: SAMSUNG_NOTICE },
   { id: 'gasan',     keyword: GASAN_KEYWORD,     label: '가산창고',              body: GASAN_NOTICE },
   { id: 'hyundai',   keyword: HYUNDAI_KEYWORD,   label: '양재 현대자동차',       body: HYUNDAI_NOTICE },
 ];
@@ -847,12 +848,12 @@ const PRESETS = [
   { name: '모두먼트', short: '모두먼트', addr: '경기 이천시 마장면 프리미엄아울렛로 33-48 A동 2층 모두먼트', contact: '배준혁 010-5582-2921' },
   { name: '삼우에프앤지', short: '냉장창고', addr: '경기 김포시 고촌읍 아라육로57번길 15 삼우 에프앤지', contact: '출고 현장 관리자 031-996-5404' },
   { name: '일산창고', short: '일산창고', addr: '경기 고양시 덕양구 통일로 1031번길 458 대양물류보관창고(컨테이너창고)', contact: '창고 담당자 010-5472-6111' },
+  { name: '에스엘라이프', short: '에스엘', addr: '경기 이천시 백사면 조읍리 520-29 3층 5번 도크', contact: '김준형 과장 010-9460-1086' },
   { name: '가산창고', short: '가산창고', addr: '서울특별시 금천구 가산디지털2로 135 가산어반워크1 지하2층 216호', contact: '' },
   { name: '신세계 강남', short: '신강', addr: '서울 서초구 신반포로 176 신세계백화점 강남점 스위트파크 지하1층 산스sans', contact: '' },
   { name: '산스 익선', short: '익선점', addr: '서울 종로구 수표로28길 30 산스 sans', contact: '' },
   { name: '본사', short: '본사', addr: '서울 중구 청계천로 100 시그니처타워 서관 1040호', contact: '' },
   { name: '산스안산공장', short: '안산공장', addr: '경기 안산시 단원구 별망로 35 WAKE B동 산스파운드리', contact: '' },
-  { name: '삼성DSR', short: '삼성수원', addr: '경기도 화성시 병점구 삼성전자로 1-1 삼성전자 DSR A타워 정문 "폴 바셋 삼성 DSR 점"', contact: '' },
   { name: '양재 현대차', short: '양재현대', addr: '서울특별시 서초구 헌릉로 12 현대자동차 양재사옥 서관 B1F 샵앳피소드', contact: '' },
 ];
 const FROM_NOTICES = [
@@ -886,7 +887,7 @@ const CONTACTS = [
   { name: '홍성훈', tel: '010-7123-0261' },
   { name: '홍윤의', tel: '010-8765-2296' },
 ];
-const AUTO_CONTACT_PRESETS = ['모두먼트', '삼우에프앤지', '일산창고'];
+const AUTO_CONTACT_PRESETS = ['모두먼트', '삼우에프앤지', '일산창고', '에스엘라이프'];
 
 const state = { pay: '월정산', resultEditedText: null };
 const selectedFromNotices = new Set();
@@ -935,15 +936,19 @@ function renderAutoNotices(containerElOrId, addr) {
 
 function buildTimeSelect(elOrId) {
   const sel = typeof elOrId === 'string' ? document.getElementById(elOrId) : elOrId;
-  sel.innerHTML = '<option value="">시간 선택</option>';
-  for (let h = 0; h < 24; h++) {
+  sel.innerHTML = '<option value="" disabled hidden selected>시간 선택</option>';
+  for (let h = 1; h <= 12; h++) {
     for (let m of [0, 15, 30, 45]) {
-      const hh = String(h).padStart(2,'0'), mm = String(m).padStart(2,'0');
-      const ampm = h < 12 ? '오전' : '오후';
-      const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
-      sel.innerHTML += `<option value="${hh}:${mm}">${ampm} ${h12}시${m > 0 ? ' ' + mm + '분' : ''}</option>`;
+      const mm = String(m).padStart(2,'0');
+      const label = h + '시' + (m > 0 ? ' ' + mm + '분' : '');
+      sel.innerHTML += `<option value="${h}:${mm}">${label}</option>`;
     }
   }
+}
+
+function buildAmPmSelect(elOrId) {
+  const sel = typeof elOrId === 'string' ? document.getElementById(elOrId) : elOrId;
+  sel.innerHTML = '<option value="" disabled hidden selected>오전/오후 선택</option><option value="AM">오전</option><option value="PM">오후</option>';
 }
 
 function setupQuickTime(groupId, fieldsId, stateKey) {
@@ -952,7 +957,7 @@ function setupQuickTime(groupId, fieldsId, stateKey) {
       document.getElementById(groupId).querySelectorAll('.pill').forEach(b => b.classList.remove('sel','err-field'));
       btn.classList.add('sel');
       document.getElementById(fieldsId).style.display = btn.dataset.mode === 'pick' ? 'block' : 'none';
-      state[stateKey] = btn.dataset.mode === 'pick' ? null : btn.dataset.mode;
+      state[stateKey] = btn.dataset.mode;  // 'immediate' | 'asap' | 'pick'
     });
   });
 }
@@ -967,8 +972,16 @@ document.getElementById('pay-group').querySelectorAll('.pill').forEach(btn => {
 
 buildTimeSelect('from-time');
 buildTimeSelect('to-time');
+buildAmPmSelect('from-ampm');
+buildAmPmSelect('to-ampm');
 setupQuickTime('from-quick', 'from-dt-fields', 'fromMode');
 setupQuickTime('to-quick', 'to-dt-fields', 'toMode');
+
+// 날짜/오전오후/시간 필드 값이 채워지면 에러 표시 즉시 제거
+['from-date','from-ampm','from-time','to-date','to-ampm','to-time'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('change', () => { if (el.value) el.classList.remove('err-field'); });
+});
 
 // 오늘/내일 빠른 날짜 버튼
 function localDateStr(offsetDays) {
@@ -1301,6 +1314,7 @@ function buildWaypointCard(wp) {
           </div>
           <div class="dt-row">
             <div class="field" style="margin-bottom:0;"><input type="date" data-role="date"></div>
+            <div class="field" style="margin-bottom:0;"><select data-role="ampm"></select></div>
             <div class="field" style="margin-bottom:0;"><select data-role="time"></select></div>
           </div>
         </div>
@@ -1325,6 +1339,7 @@ function buildWaypointCard(wp) {
   const dtFieldsEl = card.querySelector('[data-role="dt-fields"]');
   const dateEl = card.querySelector('[data-role="date"]');
   const timeEl = card.querySelector('[data-role="time"]');
+  const ampmEl = card.querySelector('[data-role="ampm"]');
   const memoEl = card.querySelector('[data-role="memo"]');
   const removeBtn = card.querySelector('[data-action="remove"]');
   const typePickerEl = card.querySelector('[data-role="type-picker"]');
@@ -1334,7 +1349,7 @@ function buildWaypointCard(wp) {
   const wpItemEl = card.querySelector('[data-role="wp-item"]');
   const wpItemLabelEl = card.querySelector('[data-role="wp-item-label"]');
 
-  wp.refs = { card, addr, contact, dateEl, timeEl, memoEl, quickEl, autoNoticesEl, presetsEl, contactBtns, typePickerEl, typeBtns, wpFormEl, typeBadgeEl, wpItemEl, wpItemLabelEl, numBadge: card.querySelector('[data-role="num"]'), numText: card.querySelector('[data-role="num-text"]') };
+  wp.refs = { card, addr, contact, dateEl, timeEl, ampmEl, memoEl, quickEl, autoNoticesEl, presetsEl, contactBtns, typePickerEl, typeBtns, wpFormEl, typeBadgeEl, wpItemEl, wpItemLabelEl, numBadge: card.querySelector('[data-role="num"]'), numText: card.querySelector('[data-role="num-text"]') };
 
   // 유형 선택
   typeBtns.forEach(btn => {
@@ -1378,6 +1393,10 @@ function buildWaypointCard(wp) {
 
   // time select
   buildTimeSelect(timeEl);
+  buildAmPmSelect(ampmEl);
+  [dateEl, ampmEl, timeEl].forEach(el => {
+    el.addEventListener('change', () => { if (el.value) el.classList.remove('err-field'); });
+  });
 
   // 오늘/내일 빠른 날짜 버튼
   setupDateQuick(dtFieldsEl.querySelector('.date-quick'), dateEl);
@@ -1532,12 +1551,29 @@ function next(n) {
     state.fromAddr = document.getElementById('from-addr').value.trim();
     state.fromContact = document.getElementById('from-contact').value.trim();
     state.fromMemo = document.getElementById('from-memo').value.trim();
-    const dtOk = state.fromMode === 'immediate' || (document.getElementById('from-date').value && document.getElementById('from-time').value);
-    const noAddr = !state.fromAddr, noContact = !state.fromContact, noDt = !state.fromMode && !dtOk;
+    const fromDateEl = document.getElementById('from-date');
+    const fromAmpmEl = document.getElementById('from-ampm');
+    const fromTimeEl = document.getElementById('from-time');
+    const dateVal = fromDateEl.value, ampmVal = fromAmpmEl.value, timeVal = fromTimeEl.value;
+    const isPick = state.fromMode === 'pick';
+    const isImmediate = state.fromMode === 'immediate';
+    const noMode = !state.fromMode;
+    const dtOk = isImmediate || (isPick && dateVal && ampmVal && timeVal);
+    const noAddr = !state.fromAddr, noContact = !state.fromContact, noDt = !dtOk;
     document.getElementById('from-addr').classList.toggle('err-field', noAddr);
     document.getElementById('from-contact').classList.toggle('err-field', noContact);
-    if (noDt) document.getElementById('from-quick').querySelectorAll('.pill').forEach(q => q.classList.add('err-field'));
-    else document.getElementById('from-quick').querySelectorAll('.pill').forEach(q => q.classList.remove('err-field'));
+    // pill / 개별 필드 에러 초기화
+    document.getElementById('from-quick').querySelectorAll('.pill').forEach(p => p.classList.remove('err-field'));
+    fromDateEl.classList.remove('err-field');
+    fromAmpmEl.classList.remove('err-field');
+    fromTimeEl.classList.remove('err-field');
+    if (noMode) {
+      document.getElementById('from-quick').querySelectorAll('.pill').forEach(p => p.classList.add('err-field'));
+    } else if (isPick) {
+      if (!dateVal) fromDateEl.classList.add('err-field');
+      if (!ampmVal) fromAmpmEl.classList.add('err-field');
+      if (!timeVal) fromTimeEl.classList.add('err-field');
+    }
     se('err1-addr', noAddr); se('err1-contact', noContact); se('err1-dt', noDt);
     if (noAddr || noContact || noDt) return;
   }
@@ -1551,11 +1587,11 @@ function fmtDate(d) {
   const dow = days[new Date(parseInt(y), parseInt(m) - 1, parseInt(day)).getDay()];
   return y + '년 ' + parseInt(m) + '월 ' + parseInt(day) + '일(' + dow + ')';
 }
-function fmtTime(t) {
-  if (!t) return '';
+function fmtTimeAmpm(ampm, t) {
+  if (!ampm || !t) return '';
   const [h, m] = t.split(':');
-  const hh = parseInt(h);
-  return (hh < 12 ? '오전 ' : '오후 ') + (hh === 0 ? 12 : hh > 12 ? hh - 12 : hh) + (m !== '00' ? ':' + m : '시');
+  const ampmLabel = ampm === 'AM' ? '오전' : '오후';
+  return ampmLabel + ' ' + h + '시' + (m !== '00' ? ' ' + m + '분' : '');
 }
 
 function addrShort(presetShort, addr) {
@@ -1572,16 +1608,28 @@ function addrShort(presetShort, addr) {
 function validateWaypoint(wp) {
   const addrVal = wp.refs.addr.value.trim();
   const contactVal = wp.refs.contact.value.trim();
-  const dtPicked = wp.refs.dateEl.value && wp.refs.timeEl.value;
-  const dtOk = wp.mode === 'asap' || dtPicked;
+  const dateVal = wp.refs.dateEl.value, ampmVal = wp.refs.ampmEl.value, timeVal = wp.refs.timeEl.value;
+  const isPick = wp.mode === 'pick';
+  const isAsap = wp.mode === 'asap';
+  const noMode = !wp.mode;
+  const dtOk = isAsap || (isPick && dateVal && ampmVal && timeVal);
   const noType = !wp.type;
   const noAddr = !addrVal, noContact = !contactVal, noDt = !dtOk;
   if (noType) wp.refs.typeBtns.forEach(b => b.classList.add('err-field'));
   else wp.refs.typeBtns.forEach(b => b.classList.remove('err-field'));
   wp.refs.addr.classList.toggle('err-field', noAddr);
   wp.refs.contact.classList.toggle('err-field', noContact);
-  if (noDt) wp.refs.quickEl.querySelectorAll('.pill').forEach(q => q.classList.add('err-field'));
-  else wp.refs.quickEl.querySelectorAll('.pill').forEach(q => q.classList.remove('err-field'));
+  wp.refs.quickEl.querySelectorAll('.pill').forEach(p => p.classList.remove('err-field'));
+  wp.refs.dateEl.classList.remove('err-field');
+  wp.refs.ampmEl.classList.remove('err-field');
+  wp.refs.timeEl.classList.remove('err-field');
+  if (noMode) {
+    wp.refs.quickEl.querySelectorAll('.pill').forEach(p => p.classList.add('err-field'));
+  } else if (isPick) {
+    if (!dateVal) wp.refs.dateEl.classList.add('err-field');
+    if (!ampmVal) wp.refs.ampmEl.classList.add('err-field');
+    if (!timeVal) wp.refs.timeEl.classList.add('err-field');
+  }
   return !(noType || noAddr || noContact || noDt);
 }
 
@@ -1590,12 +1638,28 @@ function generate() {
   state.toAddr = document.getElementById('to-addr').value.trim();
   state.toContact = document.getElementById('to-contact').value.trim();
   state.toMemo = document.getElementById('to-memo').value.trim();
-  const dtOk = state.toMode === 'asap' || (document.getElementById('to-date').value && document.getElementById('to-time').value);
-  const noAddr = !state.toAddr, noContact = !state.toContact, noDt = !state.toMode && !dtOk;
+  const toDateEl = document.getElementById('to-date');
+  const toAmpmEl = document.getElementById('to-ampm');
+  const toTimeEl = document.getElementById('to-time');
+  const toDateVal = toDateEl.value, toAmpmVal = toAmpmEl.value, toTimeVal = toTimeEl.value;
+  const toIsPick = state.toMode === 'pick';
+  const toIsAsap = state.toMode === 'asap';
+  const toNoMode = !state.toMode;
+  const dtOk = toIsAsap || (toIsPick && toDateVal && toAmpmVal && toTimeVal);
+  const noAddr = !state.toAddr, noContact = !state.toContact, noDt = !dtOk;
   document.getElementById('to-addr').classList.toggle('err-field', noAddr);
   document.getElementById('to-contact').classList.toggle('err-field', noContact);
-  if (noDt) document.getElementById('to-quick').querySelectorAll('.pill').forEach(q => q.classList.add('err-field'));
-  else document.getElementById('to-quick').querySelectorAll('.pill').forEach(q => q.classList.remove('err-field'));
+  document.getElementById('to-quick').querySelectorAll('.pill').forEach(p => p.classList.remove('err-field'));
+  toDateEl.classList.remove('err-field');
+  toAmpmEl.classList.remove('err-field');
+  toTimeEl.classList.remove('err-field');
+  if (toNoMode) {
+    document.getElementById('to-quick').querySelectorAll('.pill').forEach(p => p.classList.add('err-field'));
+  } else if (toIsPick) {
+    if (!toDateVal) toDateEl.classList.add('err-field');
+    if (!toAmpmVal) toAmpmEl.classList.add('err-field');
+    if (!toTimeVal) toTimeEl.classList.add('err-field');
+  }
   se('err2-addr', noAddr); se('err2-contact', noContact); se('err2-dt', noDt);
 
   // 경유지 validation
@@ -1615,9 +1679,9 @@ function generate() {
   }
 
   const fromDT = state.fromMode === 'immediate' ? '즉시 요청'
-    : [fmtDate(document.getElementById('from-date').value), fmtTime(document.getElementById('from-time').value)].filter(Boolean).join(' ');
+    : [fmtDate(document.getElementById('from-date').value), fmtTimeAmpm(document.getElementById('from-ampm').value, document.getElementById('from-time').value)].filter(Boolean).join(' ');
   const toDT = state.toMode === 'asap' ? '최대한 빠르게'
-    : [fmtDate(document.getElementById('to-date').value), fmtTime(document.getElementById('to-time').value)].filter(Boolean).join(' ');
+    : [fmtDate(document.getElementById('to-date').value), fmtTimeAmpm(document.getElementById('to-ampm').value, document.getElementById('to-time').value)].filter(Boolean).join(' ');
 
   const autoMatchLines = (addr) =>
     AUTO_NOTICES.filter(n => addr && addr.includes(n.keyword)).map(n => '  ' + n.body);
@@ -1654,7 +1718,7 @@ function generate() {
     const contactVal = wp.refs.contact.value.trim();
     const memoVal = wp.refs.memoEl.value.trim();
     const wpDT = wp.mode === 'asap' ? '최대한 빠르게'
-      : [fmtDate(wp.refs.dateEl.value), fmtTime(wp.refs.timeEl.value)].filter(Boolean).join(' ');
+      : [fmtDate(wp.refs.dateEl.value), fmtTimeAmpm(wp.refs.ampmEl.value, wp.refs.timeEl.value)].filter(Boolean).join(' ');
     const noticeLines = [
       ...WAYPOINT_NOTICES.filter(n => wp.selectedNotices.has(n.id)).map(n => '  ⚠ ' + n.body),
       ...autoMatchLines(addrVal)
