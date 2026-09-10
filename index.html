@@ -834,15 +834,15 @@ const SHINSEGAE_NOTICE = '매장 안쪽까지 이동 거리가 있습니다. 끌
 const SAMSUNG_KEYWORD = '삼성전자로';
 const GASAN_KEYWORD = '가산디지털2로 135';
 const GASAN_NOTICE = '지하주차장 층고 2.7M로 높이제한';
-const HYUNDAI_KEYWORD = '헌릉로 12';
-const HYUNDAI_NOTICE = '건물 바깥에 바로 택배랑 퀵 받는 사무실이 위치해있으며 해당 위치에서 담당자에게 전화';
+const HYUNDAI_KEYWORD = '길주로 180';
+const HYUNDAI_NOTICE = '지하주차장 층고 2.6M로 높이제한, EAST(동)관으로 와주세요';
 
 // 자동감지 노티스 목록 — 새로 추가하려면 이 배열에 항목만 추가하면 됩니다.
 const AUTO_NOTICES = [
   { id: 'sans',      keyword: SANS_KEYWORD,      label: '산스 (수표로28길 30)', body: SANS_NOTICE },
   { id: 'shinsegae', keyword: SHINSEGAE_KEYWORD, label: '신세계 강남',           body: SHINSEGAE_NOTICE },
   { id: 'gasan',     keyword: GASAN_KEYWORD,     label: '가산창고',              body: GASAN_NOTICE },
-  { id: 'hyundai',   keyword: HYUNDAI_KEYWORD,   label: '양재 현대자동차',       body: HYUNDAI_NOTICE },
+  { id: 'hyundai',   keyword: HYUNDAI_KEYWORD,   label: '현대백화점 부천',       body: HYUNDAI_NOTICE },
 ];
 const PRESETS = [
   { name: '모두먼트', short: '모두먼트', addr: '경기 이천시 마장면 프리미엄아울렛로 33-48 A동 2층 모두먼트', contact: '배준혁 010-5582-2921' },
@@ -854,7 +854,7 @@ const PRESETS = [
   { name: '산스 익선', short: '익선점', addr: '서울 종로구 수표로28길 30 산스 sans', contact: '' },
   { name: '본사', short: '본사', addr: '서울 중구 청계천로 100 시그니처타워 서관 1040호', contact: '' },
   { name: '산스안산공장', short: '안산공장', addr: '경기 안산시 단원구 별망로 35 WAKE B동 산스파운드리', contact: '' },
-  { name: '양재 현대차', short: '양재현대', addr: '서울특별시 서초구 헌릉로 12 현대자동차 양재사옥 서관 B1F 샵앳피소드', contact: '' },
+  { name: '현대백화점 부천', short: '현백부천', addr: '경기 부천시 원미구 길주로 180 EAST관 지하 2층 하역장', contact: '' },
 ];
 const FROM_NOTICES = [
   { id: 'fn_carry', title: '출발지 주소까지 오셔서 직접 운반 필요', body: '출발지 주소까지 오셔서 직접 픽업하여 가져가셔야 합니다.' },
